@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/handler/extension"
@@ -11,6 +12,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/tarangrastogi/graphql_gqlgen/graph"
+	"github.com/tarangrastogi/graphql_gqlgen/graph/model"
 	"github.com/vektah/gqlparser/v2/ast"
 )
 
@@ -23,9 +25,17 @@ func main() {
 		port = defaultPort
 	}
 
-	srv := handler.New(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
+	srv := handler.New(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{
+		UserCreatedChan:    make(chan *model.User),
+		PostCreatedChan:    make(chan *model.Post),
+		CommentCreatedChan: make(chan *model.Comment),
+	}}))
 
 	srv.AddTransport(transport.Options{})
+	srv.AddTransport(transport.Websocket{
+		KeepAlivePingInterval: 10 * time.Second,
+	})
+
 	srv.AddTransport(transport.GET{})
 	srv.AddTransport(transport.POST{})
 
