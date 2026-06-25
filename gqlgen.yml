@@ -197,5 +197,21 @@ models:
     fields:
       posts:
         resolver: true
+      comments:
+        resolver: true
+  
+  Post:
+    fields:
+      author:
+        resolver: true
+      comments:
+        resolver: true
+        
+  Comment:
+    fields:
+      post:
+        resolver: true
+      author:
+        resolver: true
 
         
