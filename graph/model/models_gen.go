@@ -9,6 +9,12 @@ type Comment struct {
 	Author  *User  `json:"author"`
 }
 
+type CreateCommentInput struct {
+	PostID  string `json:"postId"`
+	UserID  string `json:"userId"`
+	Content string `json:"content"`
+}
+
 type CreatePostInput struct {
 	UserID  string `json:"userId"`
 	Title   string `json:"title"`

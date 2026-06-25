@@ -47,10 +47,24 @@ input CreatePostInput {
     content: String!
 }
 
-type Mutation {
-    createUser(input: CreateUserInput!): User!
-    createPost(input: CreatePostInput!): Post!
+input CreateCommentInput {
+    postId: ID!
+    userId: ID!
+    content: String!
 }
 
+type Mutation {
+  createUser(input: CreateUserInput!): User!
+  createPost(input: CreatePostInput!): Post!
+  createComment(input: CreateCommentInput!): Comment!
+
+}
+
+
+type Subscription {
+    userCreated: User!
+    postCreated: Post!
+    commentCreated: Comment!
+}
 
 

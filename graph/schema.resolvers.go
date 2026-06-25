@@ -29,14 +29,12 @@ func (r *commentResolver) Post(ctx context.Context, obj *model.Comment) (*model.
 		return &model.Post{
 			ID:      "2",
 			Title:   "Second Post",
-			Content: "This is the content of the second post.",	
-
+			Content: "This is the content of the second post.",
 		}, nil
 	}
 
 	return nil, fmt.Errorf("No post found for comment with ID %s", obj.ID)
 }
-
 
 // Author is the resolver for the author field.
 func (r *commentResolver) Author(ctx context.Context, obj *model.Comment) (*model.User, error) {
@@ -58,7 +56,6 @@ func (r *commentResolver) Author(ctx context.Context, obj *model.Comment) (*mode
 	}
 
 	return nil, fmt.Errorf("No author found for comment with ID %s", obj.ID)
-
 }
 
 // CreateUser is the resolver for the createUser field.
@@ -89,10 +86,20 @@ func (r *mutationResolver) CreatePost(ctx context.Context, input model.CreatePos
 	}, nil
 }
 
+// CreateComment is the resolver for the createComment field.
+func (r *mutationResolver) CreateComment(ctx context.Context, input model.CreateCommentInput) (*model.Comment, error) {
+	//panic(fmt.Errorf("not implemented: CreateComment - createComment"))
+
+	return &model.Comment{
+		ID:      "1",
+		Content: input.Content,
+	}, nil
+}
+
 // Author is the resolver for the author field.
 func (r *postResolver) Author(ctx context.Context, obj *model.Post) (*model.User, error) {
 	//panic(fmt.Errorf("not implemented: Author - author"))
-	
+
 	//checks the posts id and returns the author of the post
 	switch obj.ID {
 	case "1":
@@ -116,7 +123,7 @@ func (r *postResolver) Author(ctx context.Context, obj *model.Post) (*model.User
 func (r *postResolver) Comments(ctx context.Context, obj *model.Post) ([]*model.Comment, error) {
 	//panic(fmt.Errorf("not implemented: Comments - comments"))
 
-	//checks the posts id and return its comments 
+	//checks the posts id and return its comments
 	switch obj.ID {
 	case "1":
 		return []*model.Comment{
@@ -132,18 +139,18 @@ func (r *postResolver) Comments(ctx context.Context, obj *model.Post) ([]*model.
 	case "2":
 		return []*model.Comment{
 			{
-				ID:      "3",
+				ID:      "1",
 				Content: "This is a comment on the second post.",
 			},
 			{
-				ID:      "4",
+				ID:      "2",
 				Content: "This is another comment on the second post.",
 			},
 		}, nil
-	
+
 	}
-	return nil , fmt.Errorf("No comments found for post with ID %s", obj.ID)
-}	
+	return nil, fmt.Errorf("No comments found for post with ID %s", obj.ID)
+}
 
 // Users is the resolver for the users field.
 func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
