@@ -1,6 +1,9 @@
 package graph
 
-import "github.com/tarangrastogi/graphql_gqlgen/graph/model"
+import (
+	"github.com/tarangrastogi/graphql_gqlgen/graph/model"
+	"github.com/tarangrastogi/graphql_gqlgen/internal/service"
+)
 
 //"github.com/tarangrastogi/graphql_gqlgen/graph/model"
 
@@ -8,9 +11,12 @@ import "github.com/tarangrastogi/graphql_gqlgen/graph/model"
 //
 // It serves as dependency injection for your app, add any dependencies you require
 // here.
-
 type Resolver struct {
+	UserService    *service.UserService
+	PostService    *service.PostService
+	CommentService *service.CommentService
+
 	UserCreatedChan    chan *model.User
 	PostCreatedChan    chan *model.Post
-	CommentCreatedChan	 chan *model.Comment
+	CommentCreatedChan chan *model.Comment
 }

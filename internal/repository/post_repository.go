@@ -21,7 +21,7 @@ type postRepository struct {
 }
 
 
-func newPostRepository(db *pgxpool.Pool) PostRepository {
+func NewPostRepository(db *pgxpool.Pool) PostRepository {
 	return &postRepository{
 		db: db,
 	}

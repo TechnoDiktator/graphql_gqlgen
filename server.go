@@ -13,6 +13,9 @@ import (
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/tarangrastogi/graphql_gqlgen/graph"
 	"github.com/tarangrastogi/graphql_gqlgen/graph/model"
+	"github.com/tarangrastogi/graphql_gqlgen/internal/db"
+	"github.com/tarangrastogi/graphql_gqlgen/internal/repository"
+	"github.com/tarangrastogi/graphql_gqlgen/internal/service"
 	"github.com/vektah/gqlparser/v2/ast"
 )
 
@@ -25,10 +28,29 @@ func main() {
 		port = defaultPort
 	}
 
+	pool , err :=  db.NewPostgresConnection()
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	userRepo := repository.NewUserRepository(pool)
+	postRepo := repository.NewPostRepository(pool)
+	commentRepo := repository.NewCommentRepository(pool)
+
+
+	userService := service.NewUserService(userRepo)
+	postService := service.NewPostService(postRepo ,  userRepo)
+	commentService := service.NewCommentService(commentRepo , userRepo , postRepo)
+
+
 	srv := handler.New(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{
 		UserCreatedChan:    make(chan *model.User),
 		PostCreatedChan:    make(chan *model.Post),
 		CommentCreatedChan: make(chan *model.Comment),
+		UserService: userService,
+		PostService: postService,
+		CommentService: commentService,
 	}}))
 
 	srv.AddTransport(transport.Options{})
