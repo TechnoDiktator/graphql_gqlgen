@@ -9,6 +9,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+
 	"github.com/tarangrastogi/graphql_gqlgen/graph/model"
 )
 
@@ -27,7 +28,6 @@ func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
 			Age:  25,
 		},
 	}, nil
-
 }
 
 // User is the resolver for the user field.
@@ -53,57 +53,17 @@ func (r *queryResolver) User(ctx context.Context, id string) (*model.User, error
 	}
 }
 
+// Posts is the resolver for the posts field.
+func (r *queryResolver) Posts(ctx context.Context) ([]*model.Post, error) {
+	panic(fmt.Errorf("not implemented: Posts - posts"))
+}
+
+// Post is the resolver for the post field.
+func (r *queryResolver) Post(ctx context.Context, id string) (*model.Post, error) {
+	panic(fmt.Errorf("not implemented: Post - post"))
+}
+
 // Query returns QueryResolver implementation.
 func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
 type queryResolver struct{ *Resolver }
-
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//    it when you're done.
-//  - You have helper methods in this file. Move them out to keep these resolver files clean.
-/*
-	func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) (*model.Todo, error) {
-	//panic(fmt.Errorf("not implemented: CreateTodo - createTodo"))
-	randNumber, _ := rand.Int(rand.Reader, big.NewInt(100))
-	log.Println("This is my first function")
-	fmt.Printf("Hello, World!")
-	todo := &model.Todo{
-		Text: input.Text,
-		ID:   fmt.Sprintf("T%d", randNumber),
-		User: &model.User{
-			ID:   input.UserID,
-			Name: "User" + input.UserID,
-		},
-	}
-	r.todos = append(r.todos, todo)
-	return todo, nil
-}
-func (r *mutationResolver) CreatePost(ctx context.Context, input model.NewPost) (*model.Post, error) {
-	panic(fmt.Errorf("not implemented: CreatePost - createPost"))
-}
-func (r *mutationResolver) CreateComment(ctx context.Context, input model.NewComment) (*model.Comment, error) {
-	panic(fmt.Errorf("not implemented: CreateComment - createComment"))
-}
-func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
-	return r.todos, nil
-}
-func (r *queryResolver) Posts(ctx context.Context) ([]*model.Post, error) {
-	panic(fmt.Errorf("not implemented: Posts - posts"))
-}
-func (r *queryResolver) Post(ctx context.Context, id string) (*model.Post, error) {
-	panic(fmt.Errorf("not implemented: Post - post"))
-}
-func (r *queryResolver) Comments(ctx context.Context, postID string) ([]*model.Comment, error) {
-	panic(fmt.Errorf("not implemented: Comments - comments"))
-}
-func (r *subscriptionResolver) PostCretaed(ctx context.Context) (<-chan *model.Post, error) {
-	panic(fmt.Errorf("not implemented: PostCretaed - postCretaed"))
-}
-func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
-func (r *Resolver) Subscription() SubscriptionResolver { return &subscriptionResolver{r} }
-type mutationResolver struct{ *Resolver }
-type subscriptionResolver struct{ *Resolver }
-*/
