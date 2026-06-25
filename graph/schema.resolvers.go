@@ -353,10 +353,54 @@ func (r *subscriptionResolver) CommentCreated(ctx context.Context) (<-chan *mode
 	return r.CommentCreatedChan, nil
 }
 
+/*
+GraphQL Query
 
+users {
+    posts
+}
 
+        │
+        ▼
 
+userResolver.Posts()
 
+        │
+obj.ID = "5"
+
+        │
+        ▼
+
+Parse to int64
+
+        │
+        ▼
+
+PostService.GetByUserID(5)
+
+        │
+        ▼
+
+SELECT *
+FROM posts
+WHERE user_id = 5
+
+        │
+        ▼
+
+[]entity.Post
+
+        │
+        ▼
+
+Mapper
+
+        │
+        ▼
+
+[]model.Post
+
+*/
 
 // Posts is the resolver for the posts field.
 func (r *userResolver) Posts(ctx context.Context, obj *model.User) ([]*model.Post, error) {
@@ -389,19 +433,19 @@ func (r *userResolver) Posts(ctx context.Context, obj *model.User) ([]*model.Pos
 	// 	}, nil
 	// }
 
-	userId , err := strconv.ParseInt(obj.ID , 10 , 64)
-	if(err != nil ){
-		return nil  , err
-	}
-
-	posts , err := r.PostService.GetByUserID(ctx , userId)
-	
-	//now map these psosts to the graphql equivalent 
+	userId, err := strconv.ParseInt(obj.ID, 10, 64)
 	if err != nil {
-		return nil , err
+		return nil, err
 	}
 
-	return mapper.ToGraphQLPosts(posts) , nil
+	posts, err := r.PostService.GetByUserID(ctx, userId)
+
+	//now map these psosts to the graphql equivalent
+	if err != nil {
+		return nil, err
+	}
+
+	return mapper.ToGraphQLPosts(posts), nil
 	// return nil, fmt.Errorf("No posts found for user with ID %s", obj.ID)
 }
 
@@ -409,6 +453,21 @@ func (r *userResolver) Posts(ctx context.Context, obj *model.User) ([]*model.Pos
 func (r *userResolver) Comments(ctx context.Context, obj *model.User) ([]*model.Comment, error) {
 	//panic(fmt.Errorf("not implemented: Comments - comments"))
 	// return []*model.Comment{}, nil
+
+	userId, err := strconv.ParseInt(obj.ID, 10, 64)
+	if err != nil {
+		return nil, err
+	}
+
+	comments, err := r.CommentService.GetByUserID(ctx, userId)
+
+	if err != nil {
+		return nil, err
+
+	}
+
+	return mapper.ToGraphQLComments(comments), nil
+
 }
 
 // Comment returns CommentResolver implementation.
