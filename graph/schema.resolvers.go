@@ -30,7 +30,7 @@ func (r *commentResolver) Post(ctx context.Context, obj *model.Comment) (*model.
 			ID:      "2",
 			Title:   "Second Post",
 			Content: "This is the content of the second post.",	
-			
+
 		}, nil
 	}
 
@@ -91,13 +91,59 @@ func (r *mutationResolver) CreatePost(ctx context.Context, input model.CreatePos
 
 // Author is the resolver for the author field.
 func (r *postResolver) Author(ctx context.Context, obj *model.Post) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: Author - author"))
+	//panic(fmt.Errorf("not implemented: Author - author"))
+	
+	//checks the posts id and returns the author of the post
+	switch obj.ID {
+	case "1":
+		return &model.User{
+			ID:   "1",
+			Name: "John Doe",
+			Age:  30,
+		}, nil
+	case "2":
+		return &model.User{
+			ID:   "2",
+			Name: "Jane Smith",
+			Age:  25,
+		}, nil
+	}
+
+	return nil, fmt.Errorf("No author found for post with ID %s", obj.ID)
 }
 
 // Comments is the resolver for the comments field.
 func (r *postResolver) Comments(ctx context.Context, obj *model.Post) ([]*model.Comment, error) {
-	panic(fmt.Errorf("not implemented: Comments - comments"))
-}
+	//panic(fmt.Errorf("not implemented: Comments - comments"))
+
+	//checks the posts id and return its comments 
+	switch obj.ID {
+	case "1":
+		return []*model.Comment{
+			{
+				ID:      "1",
+				Content: "This is a comment on the first post.",
+			},
+			{
+				ID:      "2",
+				Content: "This is another comment on the first post.",
+			},
+		}, nil
+	case "2":
+		return []*model.Comment{
+			{
+				ID:      "3",
+				Content: "This is a comment on the second post.",
+			},
+			{
+				ID:      "4",
+				Content: "This is another comment on the second post.",
+			},
+		}, nil
+	
+	}
+	return nil , fmt.Errorf("No comments found for post with ID %s", obj.ID)
+}	
 
 // Users is the resolver for the users field.
 func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
