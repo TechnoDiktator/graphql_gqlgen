@@ -24,4 +24,21 @@ type Query {
 
 }
 
+input CreateUserInput {
+    name: String!
+    age: Int!
+}
+
+input CreatePostInput {
+    userId: ID!
+    title: String!
+    content: String!
+}
+
+type Mutation {
+    createUser(input: CreateUserInput!): User!
+    createPost(input: CreatePostInput!): Post!
+}
+
+
 

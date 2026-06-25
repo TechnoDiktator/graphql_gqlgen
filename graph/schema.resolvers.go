@@ -13,6 +13,16 @@ import (
 	"github.com/tarangrastogi/graphql_gqlgen/graph/model"
 )
 
+// CreateUser is the resolver for the createUser field.
+func (r *mutationResolver) CreateUser(ctx context.Context, input model.CreateUserInput) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: CreateUser - createUser"))
+}
+
+// CreatePost is the resolver for the createPost field.
+func (r *mutationResolver) CreatePost(ctx context.Context, input model.CreatePostInput) (*model.Post, error) {
+	panic(fmt.Errorf("not implemented: CreatePost - createPost"))
+}
+
 // Users is the resolver for the users field.
 func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
 	//panic(fmt.Errorf("not implemented: Users - users"))
@@ -55,15 +65,74 @@ func (r *queryResolver) User(ctx context.Context, id string) (*model.User, error
 
 // Posts is the resolver for the posts field.
 func (r *queryResolver) Posts(ctx context.Context) ([]*model.Post, error) {
-	panic(fmt.Errorf("not implemented: Posts - posts"))
+	//panic(fmt.Errorf("not implemented: Posts - posts"))
+	return []*model.Post{
+		{
+			ID:      "1",
+			Title:   "First Post",
+			Content: "This is the content of the first post.",
+		},
+		{
+			ID:      "2",
+			Title:   "Second Post",
+			Content: "This is the content of the second post.",
+		},
+	}, nil
 }
 
 // Post is the resolver for the post field.
 func (r *queryResolver) Post(ctx context.Context, id string) (*model.Post, error) {
-	panic(fmt.Errorf("not implemented: Post - post"))
+	//panic(fmt.Errorf("not implemented: Post - post"))
+	return &model.Post{
+		ID:      id,
+		Title:   fmt.Sprintf("Post %s", id),
+		Content: fmt.Sprintf("This is the content of post %s.", id),
+	}, nil
 }
+
+// Posts is the resolver for the posts field.
+func (r *userResolver) Posts(ctx context.Context, obj *model.User) ([]*model.Post, error) {
+	switch obj.ID {
+	case "1":
+		return []*model.Post{
+			{
+				ID:      "1",
+				Title:   "First Post",
+				Content: "This is the content of the first post.",
+			},
+			{
+				ID:      "2",
+				Title:   "Second Post",
+				Content: "This is the content of the second post.",
+			},
+		}, nil
+	case "2":
+		return []*model.Post{
+			{
+				ID:      "3",
+				Title:   "Third Post",
+				Content: "This is the content of the third post.",
+			},
+			{
+				ID:      "4",
+				Title:   "Fourth Post",
+				Content: "This is the content of the fourth post.",
+			},
+		}, nil
+	}
+
+	return nil, fmt.Errorf("No posts found for user with ID %s", obj.ID)
+}
+
+// Mutation returns MutationResolver implementation.
+func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
 
 // Query returns QueryResolver implementation.
 func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
+// User returns UserResolver implementation.
+func (r *Resolver) User() UserResolver { return &userResolver{r} }
+
+type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
+type userResolver struct{ *Resolver }
