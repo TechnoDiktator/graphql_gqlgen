@@ -14,7 +14,7 @@ import (
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/introspection"
-	"github.com/tarangrastogi/graphql_gqlgen/graph/model"
+	manualmodels "github.com/tarangrastogi/graphql_gqlgen/internal/manualmodel"
 	gqlparser "github.com/vektah/gqlparser/v2"
 	"github.com/vektah/gqlparser/v2/ast"
 )
@@ -49,9 +49,9 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		CreateComment func(childComplexity int, input model.CreateCommentInput) int
-		CreatePost    func(childComplexity int, input model.CreatePostInput) int
-		CreateUser    func(childComplexity int, input model.CreateUserInput) int
+		CreateComment func(childComplexity int, input manualmodels.CreateCommentInput) int
+		CreatePost    func(childComplexity int, input manualmodels.CreatePostInput) int
+		CreateUser    func(childComplexity int, input manualmodels.CreateUserInput) int
 	}
 
 	Post struct {
@@ -89,32 +89,32 @@ type ComplexityRoot struct {
 // region    ************************** generated!.gotpl **************************
 
 type CommentResolver interface {
-	Post(ctx context.Context, obj *model.Comment) (*model.Post, error)
-	Author(ctx context.Context, obj *model.Comment) (*model.User, error)
+	Post(ctx context.Context, obj *manualmodels.Comment) (*manualmodels.Post, error)
+	Author(ctx context.Context, obj *manualmodels.Comment) (*manualmodels.User, error)
 }
 type MutationResolver interface {
-	CreateUser(ctx context.Context, input model.CreateUserInput) (*model.User, error)
-	CreatePost(ctx context.Context, input model.CreatePostInput) (*model.Post, error)
-	CreateComment(ctx context.Context, input model.CreateCommentInput) (*model.Comment, error)
+	CreateUser(ctx context.Context, input manualmodels.CreateUserInput) (*manualmodels.User, error)
+	CreatePost(ctx context.Context, input manualmodels.CreatePostInput) (*manualmodels.Post, error)
+	CreateComment(ctx context.Context, input manualmodels.CreateCommentInput) (*manualmodels.Comment, error)
 }
 type PostResolver interface {
-	Author(ctx context.Context, obj *model.Post) (*model.User, error)
-	Comments(ctx context.Context, obj *model.Post) ([]*model.Comment, error)
+	Author(ctx context.Context, obj *manualmodels.Post) (*manualmodels.User, error)
+	Comments(ctx context.Context, obj *manualmodels.Post) ([]*manualmodels.Comment, error)
 }
 type QueryResolver interface {
-	Users(ctx context.Context) ([]*model.User, error)
-	User(ctx context.Context, id string) (*model.User, error)
-	Posts(ctx context.Context) ([]*model.Post, error)
-	Post(ctx context.Context, id string) (*model.Post, error)
+	Users(ctx context.Context) ([]*manualmodels.User, error)
+	User(ctx context.Context, id string) (*manualmodels.User, error)
+	Posts(ctx context.Context) ([]*manualmodels.Post, error)
+	Post(ctx context.Context, id string) (*manualmodels.Post, error)
 }
 type SubscriptionResolver interface {
-	UserCreated(ctx context.Context) (<-chan *model.User, error)
-	PostCreated(ctx context.Context) (<-chan *model.Post, error)
-	CommentCreated(ctx context.Context) (<-chan *model.Comment, error)
+	UserCreated(ctx context.Context) (<-chan *manualmodels.User, error)
+	PostCreated(ctx context.Context) (<-chan *manualmodels.Post, error)
+	CommentCreated(ctx context.Context) (<-chan *manualmodels.Comment, error)
 }
 type UserResolver interface {
-	Posts(ctx context.Context, obj *model.User) ([]*model.Post, error)
-	Comments(ctx context.Context, obj *model.User) ([]*model.Comment, error)
+	Posts(ctx context.Context, obj *manualmodels.User) ([]*manualmodels.Post, error)
+	Comments(ctx context.Context, obj *manualmodels.User) ([]*manualmodels.Comment, error)
 }
 
 // endregion ************************** generated!.gotpl **************************
@@ -170,7 +170,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			return 0, false
 		}
 
-		return e.ComplexityRoot.Mutation.CreateComment(childComplexity, args["input"].(model.CreateCommentInput)), true
+		return e.ComplexityRoot.Mutation.CreateComment(childComplexity, args["input"].(manualmodels.CreateCommentInput)), true
 	case "Mutation.createPost":
 		if e.ComplexityRoot.Mutation.CreatePost == nil {
 			break
@@ -181,7 +181,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			return 0, false
 		}
 
-		return e.ComplexityRoot.Mutation.CreatePost(childComplexity, args["input"].(model.CreatePostInput)), true
+		return e.ComplexityRoot.Mutation.CreatePost(childComplexity, args["input"].(manualmodels.CreatePostInput)), true
 	case "Mutation.createUser":
 		if e.ComplexityRoot.Mutation.CreateUser == nil {
 			break
@@ -192,7 +192,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			return 0, false
 		}
 
-		return e.ComplexityRoot.Mutation.CreateUser(childComplexity, args["input"].(model.CreateUserInput)), true
+		return e.ComplexityRoot.Mutation.CreateUser(childComplexity, args["input"].(manualmodels.CreateUserInput)), true
 
 	case "Post.author":
 		if e.ComplexityRoot.Post.Author == nil {
@@ -598,8 +598,8 @@ func (ec *executionContext) field_Mutation_createComment_args(ctx context.Contex
 	var err error
 	args := map[string]any{}
 	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "input",
-		func(ctx context.Context, v any) (model.CreateCommentInput, error) {
-			return ec.unmarshalNCreateCommentInput2githubᚗcomᚋtarangrastogiᚋgraphql_gqlgenᚋgraphᚋmodelᚐCreateCommentInput(ctx, v)
+		func(ctx context.Context, v any) (manualmodels.CreateCommentInput, error) {
+			return ec.unmarshalNCreateCommentInput2githubᚗcomᚋtarangrastogiᚋgraphql_gqlgenᚋinternalᚋmanualmodelᚐCreateCommentInput(ctx, v)
 		})
 	if err != nil {
 		return nil, err
@@ -612,8 +612,8 @@ func (ec *executionContext) field_Mutation_createPost_args(ctx context.Context, 
 	var err error
 	args := map[string]any{}
 	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "input",
-		func(ctx context.Context, v any) (model.CreatePostInput, error) {
-			return ec.unmarshalNCreatePostInput2githubᚗcomᚋtarangrastogiᚋgraphql_gqlgenᚋgraphᚋmodelᚐCreatePostInput(ctx, v)
+		func(ctx context.Context, v any) (manualmodels.CreatePostInput, error) {
+			return ec.unmarshalNCreatePostInput2githubᚗcomᚋtarangrastogiᚋgraphql_gqlgenᚋinternalᚋmanualmodelᚐCreatePostInput(ctx, v)
 		})
 	if err != nil {
 		return nil, err
@@ -626,8 +626,8 @@ func (ec *executionContext) field_Mutation_createUser_args(ctx context.Context, 
 	var err error
 	args := map[string]any{}
 	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "input",
-		func(ctx context.Context, v any) (model.CreateUserInput, error) {
-			return ec.unmarshalNCreateUserInput2githubᚗcomᚋtarangrastogiᚋgraphql_gqlgenᚋgraphᚋmodelᚐCreateUserInput(ctx, v)
+		func(ctx context.Context, v any) (manualmodels.CreateUserInput, error) {
+			return ec.unmarshalNCreateUserInput2githubᚗcomᚋtarangrastogiᚋgraphql_gqlgenᚋinternalᚋmanualmodelᚐCreateUserInput(ctx, v)
 		})
 	if err != nil {
 		return nil, err
@@ -738,7 +738,7 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 
 // region    **************************** field.gotpl *****************************
 
-func (ec *executionContext) _Comment_id(ctx context.Context, field graphql.CollectedField, obj *model.Comment) (ret graphql.Marshaler) {
+func (ec *executionContext) _Comment_id(ctx context.Context, field graphql.CollectedField, obj *manualmodels.Comment) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
 		ec.OperationContext,
@@ -761,7 +761,7 @@ func (ec *executionContext) fieldContext_Comment_id(_ context.Context, field gra
 	return graphql.NewScalarFieldContext("Comment", field, false, false, errors.New("field of type ID does not have child fields"))
 }
 
-func (ec *executionContext) _Comment_content(ctx context.Context, field graphql.CollectedField, obj *model.Comment) (ret graphql.Marshaler) {
+func (ec *executionContext) _Comment_content(ctx context.Context, field graphql.CollectedField, obj *manualmodels.Comment) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
 		ec.OperationContext,
@@ -784,7 +784,7 @@ func (ec *executionContext) fieldContext_Comment_content(_ context.Context, fiel
 	return graphql.NewScalarFieldContext("Comment", field, false, false, errors.New("field of type String does not have child fields"))
 }
 
-func (ec *executionContext) _Comment_post(ctx context.Context, field graphql.CollectedField, obj *model.Comment) (ret graphql.Marshaler) {
+func (ec *executionContext) _Comment_post(ctx context.Context, field graphql.CollectedField, obj *manualmodels.Comment) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
 		ec.OperationContext,
@@ -796,8 +796,8 @@ func (ec *executionContext) _Comment_post(ctx context.Context, field graphql.Col
 			return ec.Resolvers.Comment().Post(ctx, obj)
 		},
 		nil,
-		func(ctx context.Context, selections ast.SelectionSet, v *model.Post) graphql.Marshaler {
-			return ec.marshalNPost2ᚖgithubᚗcomᚋtarangrastogiᚋgraphql_gqlgenᚋgraphᚋmodelᚐPost(ctx, selections, v)
+		func(ctx context.Context, selections ast.SelectionSet, v *manualmodels.Post) graphql.Marshaler {
+			return ec.marshalNPost2ᚖgithubᚗcomᚋtarangrastogiᚋgraphql_gqlgenᚋinternalᚋmanualmodelᚐPost(ctx, selections, v)
 		},
 		true,
 		true,
@@ -816,7 +816,7 @@ func (ec *executionContext) fieldContext_Comment_post(_ context.Context, field g
 	return fc, nil
 }
 
-func (ec *executionContext) _Comment_author(ctx context.Context, field graphql.CollectedField, obj *model.Comment) (ret graphql.Marshaler) {
+func (ec *executionContext) _Comment_author(ctx context.Context, field graphql.CollectedField, obj *manualmodels.Comment) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
 		ec.OperationContext,
@@ -828,8 +828,8 @@ func (ec *executionContext) _Comment_author(ctx context.Context, field graphql.C
 			return ec.Resolvers.Comment().Author(ctx, obj)
 		},
 		nil,
-		func(ctx context.Context, selections ast.SelectionSet, v *model.User) graphql.Marshaler {
-			return ec.marshalNUser2ᚖgithubᚗcomᚋtarangrastogiᚋgraphql_gqlgenᚋgraphᚋmodelᚐUser(ctx, selections, v)
+		func(ctx context.Context, selections ast.SelectionSet, v *manualmodels.User) graphql.Marshaler {
+			return ec.marshalNUser2ᚖgithubᚗcomᚋtarangrastogiᚋgraphql_gqlgenᚋinternalᚋmanualmodelᚐUser(ctx, selections, v)
 		},
 		true,
 		true,
@@ -858,11 +858,11 @@ func (ec *executionContext) _Mutation_createUser(ctx context.Context, field grap
 		},
 		func(ctx context.Context) (any, error) {
 			fc := graphql.GetFieldContext(ctx)
-			return ec.Resolvers.Mutation().CreateUser(ctx, fc.Args["input"].(model.CreateUserInput))
+			return ec.Resolvers.Mutation().CreateUser(ctx, fc.Args["input"].(manualmodels.CreateUserInput))
 		},
 		nil,
-		func(ctx context.Context, selections ast.SelectionSet, v *model.User) graphql.Marshaler {
-			return ec.marshalNUser2ᚖgithubᚗcomᚋtarangrastogiᚋgraphql_gqlgenᚋgraphᚋmodelᚐUser(ctx, selections, v)
+		func(ctx context.Context, selections ast.SelectionSet, v *manualmodels.User) graphql.Marshaler {
+			return ec.marshalNUser2ᚖgithubᚗcomᚋtarangrastogiᚋgraphql_gqlgenᚋinternalᚋmanualmodelᚐUser(ctx, selections, v)
 		},
 		true,
 		true,
@@ -902,11 +902,11 @@ func (ec *executionContext) _Mutation_createPost(ctx context.Context, field grap
 		},
 		func(ctx context.Context) (any, error) {
 			fc := graphql.GetFieldContext(ctx)
-			return ec.Resolvers.Mutation().CreatePost(ctx, fc.Args["input"].(model.CreatePostInput))
+			return ec.Resolvers.Mutation().CreatePost(ctx, fc.Args["input"].(manualmodels.CreatePostInput))
 		},
 		nil,
-		func(ctx context.Context, selections ast.SelectionSet, v *model.Post) graphql.Marshaler {
-			return ec.marshalNPost2ᚖgithubᚗcomᚋtarangrastogiᚋgraphql_gqlgenᚋgraphᚋmodelᚐPost(ctx, selections, v)
+		func(ctx context.Context, selections ast.SelectionSet, v *manualmodels.Post) graphql.Marshaler {
+			return ec.marshalNPost2ᚖgithubᚗcomᚋtarangrastogiᚋgraphql_gqlgenᚋinternalᚋmanualmodelᚐPost(ctx, selections, v)
 		},
 		true,
 		true,
@@ -946,11 +946,11 @@ func (ec *executionContext) _Mutation_createComment(ctx context.Context, field g
 		},
 		func(ctx context.Context) (any, error) {
 			fc := graphql.GetFieldContext(ctx)
-			return ec.Resolvers.Mutation().CreateComment(ctx, fc.Args["input"].(model.CreateCommentInput))
+			return ec.Resolvers.Mutation().CreateComment(ctx, fc.Args["input"].(manualmodels.CreateCommentInput))
 		},
 		nil,
-		func(ctx context.Context, selections ast.SelectionSet, v *model.Comment) graphql.Marshaler {
-			return ec.marshalNComment2ᚖgithubᚗcomᚋtarangrastogiᚋgraphql_gqlgenᚋgraphᚋmodelᚐComment(ctx, selections, v)
+		func(ctx context.Context, selections ast.SelectionSet, v *manualmodels.Comment) graphql.Marshaler {
+			return ec.marshalNComment2ᚖgithubᚗcomᚋtarangrastogiᚋgraphql_gqlgenᚋinternalᚋmanualmodelᚐComment(ctx, selections, v)
 		},
 		true,
 		true,
@@ -980,7 +980,7 @@ func (ec *executionContext) fieldContext_Mutation_createComment(ctx context.Cont
 	return fc, nil
 }
 
-func (ec *executionContext) _Post_id(ctx context.Context, field graphql.CollectedField, obj *model.Post) (ret graphql.Marshaler) {
+func (ec *executionContext) _Post_id(ctx context.Context, field graphql.CollectedField, obj *manualmodels.Post) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
 		ec.OperationContext,
@@ -1003,7 +1003,7 @@ func (ec *executionContext) fieldContext_Post_id(_ context.Context, field graphq
 	return graphql.NewScalarFieldContext("Post", field, false, false, errors.New("field of type ID does not have child fields"))
 }
 
-func (ec *executionContext) _Post_title(ctx context.Context, field graphql.CollectedField, obj *model.Post) (ret graphql.Marshaler) {
+func (ec *executionContext) _Post_title(ctx context.Context, field graphql.CollectedField, obj *manualmodels.Post) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
 		ec.OperationContext,
@@ -1026,7 +1026,7 @@ func (ec *executionContext) fieldContext_Post_title(_ context.Context, field gra
 	return graphql.NewScalarFieldContext("Post", field, false, false, errors.New("field of type String does not have child fields"))
 }
 
-func (ec *executionContext) _Post_content(ctx context.Context, field graphql.CollectedField, obj *model.Post) (ret graphql.Marshaler) {
+func (ec *executionContext) _Post_content(ctx context.Context, field graphql.CollectedField, obj *manualmodels.Post) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
 		ec.OperationContext,
@@ -1049,7 +1049,7 @@ func (ec *executionContext) fieldContext_Post_content(_ context.Context, field g
 	return graphql.NewScalarFieldContext("Post", field, false, false, errors.New("field of type String does not have child fields"))
 }
 
-func (ec *executionContext) _Post_author(ctx context.Context, field graphql.CollectedField, obj *model.Post) (ret graphql.Marshaler) {
+func (ec *executionContext) _Post_author(ctx context.Context, field graphql.CollectedField, obj *manualmodels.Post) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
 		ec.OperationContext,
@@ -1061,8 +1061,8 @@ func (ec *executionContext) _Post_author(ctx context.Context, field graphql.Coll
 			return ec.Resolvers.Post().Author(ctx, obj)
 		},
 		nil,
-		func(ctx context.Context, selections ast.SelectionSet, v *model.User) graphql.Marshaler {
-			return ec.marshalNUser2ᚖgithubᚗcomᚋtarangrastogiᚋgraphql_gqlgenᚋgraphᚋmodelᚐUser(ctx, selections, v)
+		func(ctx context.Context, selections ast.SelectionSet, v *manualmodels.User) graphql.Marshaler {
+			return ec.marshalNUser2ᚖgithubᚗcomᚋtarangrastogiᚋgraphql_gqlgenᚋinternalᚋmanualmodelᚐUser(ctx, selections, v)
 		},
 		true,
 		true,
@@ -1081,7 +1081,7 @@ func (ec *executionContext) fieldContext_Post_author(_ context.Context, field gr
 	return fc, nil
 }
 
-func (ec *executionContext) _Post_comments(ctx context.Context, field graphql.CollectedField, obj *model.Post) (ret graphql.Marshaler) {
+func (ec *executionContext) _Post_comments(ctx context.Context, field graphql.CollectedField, obj *manualmodels.Post) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
 		ec.OperationContext,
@@ -1093,8 +1093,8 @@ func (ec *executionContext) _Post_comments(ctx context.Context, field graphql.Co
 			return ec.Resolvers.Post().Comments(ctx, obj)
 		},
 		nil,
-		func(ctx context.Context, selections ast.SelectionSet, v []*model.Comment) graphql.Marshaler {
-			return ec.marshalNComment2ᚕᚖgithubᚗcomᚋtarangrastogiᚋgraphql_gqlgenᚋgraphᚋmodelᚐCommentᚄ(ctx, selections, v)
+		func(ctx context.Context, selections ast.SelectionSet, v []*manualmodels.Comment) graphql.Marshaler {
+			return ec.marshalNComment2ᚕᚖgithubᚗcomᚋtarangrastogiᚋgraphql_gqlgenᚋinternalᚋmanualmodelᚐCommentᚄ(ctx, selections, v)
 		},
 		true,
 		true,
@@ -1125,8 +1125,8 @@ func (ec *executionContext) _Query_users(ctx context.Context, field graphql.Coll
 			return ec.Resolvers.Query().Users(ctx)
 		},
 		nil,
-		func(ctx context.Context, selections ast.SelectionSet, v []*model.User) graphql.Marshaler {
-			return ec.marshalNUser2ᚕᚖgithubᚗcomᚋtarangrastogiᚋgraphql_gqlgenᚋgraphᚋmodelᚐUserᚄ(ctx, selections, v)
+		func(ctx context.Context, selections ast.SelectionSet, v []*manualmodels.User) graphql.Marshaler {
+			return ec.marshalNUser2ᚕᚖgithubᚗcomᚋtarangrastogiᚋgraphql_gqlgenᚋinternalᚋmanualmodelᚐUserᚄ(ctx, selections, v)
 		},
 		true,
 		true,
@@ -1158,8 +1158,8 @@ func (ec *executionContext) _Query_user(ctx context.Context, field graphql.Colle
 			return ec.Resolvers.Query().User(ctx, fc.Args["id"].(string))
 		},
 		nil,
-		func(ctx context.Context, selections ast.SelectionSet, v *model.User) graphql.Marshaler {
-			return ec.marshalOUser2ᚖgithubᚗcomᚋtarangrastogiᚋgraphql_gqlgenᚋgraphᚋmodelᚐUser(ctx, selections, v)
+		func(ctx context.Context, selections ast.SelectionSet, v *manualmodels.User) graphql.Marshaler {
+			return ec.marshalOUser2ᚖgithubᚗcomᚋtarangrastogiᚋgraphql_gqlgenᚋinternalᚋmanualmodelᚐUser(ctx, selections, v)
 		},
 		true,
 		false,
@@ -1201,8 +1201,8 @@ func (ec *executionContext) _Query_posts(ctx context.Context, field graphql.Coll
 			return ec.Resolvers.Query().Posts(ctx)
 		},
 		nil,
-		func(ctx context.Context, selections ast.SelectionSet, v []*model.Post) graphql.Marshaler {
-			return ec.marshalNPost2ᚕᚖgithubᚗcomᚋtarangrastogiᚋgraphql_gqlgenᚋgraphᚋmodelᚐPostᚄ(ctx, selections, v)
+		func(ctx context.Context, selections ast.SelectionSet, v []*manualmodels.Post) graphql.Marshaler {
+			return ec.marshalNPost2ᚕᚖgithubᚗcomᚋtarangrastogiᚋgraphql_gqlgenᚋinternalᚋmanualmodelᚐPostᚄ(ctx, selections, v)
 		},
 		true,
 		true,
@@ -1234,8 +1234,8 @@ func (ec *executionContext) _Query_post(ctx context.Context, field graphql.Colle
 			return ec.Resolvers.Query().Post(ctx, fc.Args["id"].(string))
 		},
 		nil,
-		func(ctx context.Context, selections ast.SelectionSet, v *model.Post) graphql.Marshaler {
-			return ec.marshalOPost2ᚖgithubᚗcomᚋtarangrastogiᚋgraphql_gqlgenᚋgraphᚋmodelᚐPost(ctx, selections, v)
+		func(ctx context.Context, selections ast.SelectionSet, v *manualmodels.Post) graphql.Marshaler {
+			return ec.marshalOPost2ᚖgithubᚗcomᚋtarangrastogiᚋgraphql_gqlgenᚋinternalᚋmanualmodelᚐPost(ctx, selections, v)
 		},
 		true,
 		false,
@@ -1353,8 +1353,8 @@ func (ec *executionContext) _Subscription_userCreated(ctx context.Context, field
 			return ec.Resolvers.Subscription().UserCreated(ctx)
 		},
 		nil,
-		func(ctx context.Context, selections ast.SelectionSet, v *model.User) graphql.Marshaler {
-			return ec.marshalNUser2ᚖgithubᚗcomᚋtarangrastogiᚋgraphql_gqlgenᚋgraphᚋmodelᚐUser(ctx, selections, v)
+		func(ctx context.Context, selections ast.SelectionSet, v *manualmodels.User) graphql.Marshaler {
+			return ec.marshalNUser2ᚖgithubᚗcomᚋtarangrastogiᚋgraphql_gqlgenᚋinternalᚋmanualmodelᚐUser(ctx, selections, v)
 		},
 		true,
 		true,
@@ -1385,8 +1385,8 @@ func (ec *executionContext) _Subscription_postCreated(ctx context.Context, field
 			return ec.Resolvers.Subscription().PostCreated(ctx)
 		},
 		nil,
-		func(ctx context.Context, selections ast.SelectionSet, v *model.Post) graphql.Marshaler {
-			return ec.marshalNPost2ᚖgithubᚗcomᚋtarangrastogiᚋgraphql_gqlgenᚋgraphᚋmodelᚐPost(ctx, selections, v)
+		func(ctx context.Context, selections ast.SelectionSet, v *manualmodels.Post) graphql.Marshaler {
+			return ec.marshalNPost2ᚖgithubᚗcomᚋtarangrastogiᚋgraphql_gqlgenᚋinternalᚋmanualmodelᚐPost(ctx, selections, v)
 		},
 		true,
 		true,
@@ -1417,8 +1417,8 @@ func (ec *executionContext) _Subscription_commentCreated(ctx context.Context, fi
 			return ec.Resolvers.Subscription().CommentCreated(ctx)
 		},
 		nil,
-		func(ctx context.Context, selections ast.SelectionSet, v *model.Comment) graphql.Marshaler {
-			return ec.marshalNComment2ᚖgithubᚗcomᚋtarangrastogiᚋgraphql_gqlgenᚋgraphᚋmodelᚐComment(ctx, selections, v)
+		func(ctx context.Context, selections ast.SelectionSet, v *manualmodels.Comment) graphql.Marshaler {
+			return ec.marshalNComment2ᚖgithubᚗcomᚋtarangrastogiᚋgraphql_gqlgenᚋinternalᚋmanualmodelᚐComment(ctx, selections, v)
 		},
 		true,
 		true,
@@ -1437,7 +1437,7 @@ func (ec *executionContext) fieldContext_Subscription_commentCreated(_ context.C
 	return fc, nil
 }
 
-func (ec *executionContext) _User_id(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+func (ec *executionContext) _User_id(ctx context.Context, field graphql.CollectedField, obj *manualmodels.User) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
 		ec.OperationContext,
@@ -1460,7 +1460,7 @@ func (ec *executionContext) fieldContext_User_id(_ context.Context, field graphq
 	return graphql.NewScalarFieldContext("User", field, false, false, errors.New("field of type ID does not have child fields"))
 }
 
-func (ec *executionContext) _User_name(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+func (ec *executionContext) _User_name(ctx context.Context, field graphql.CollectedField, obj *manualmodels.User) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
 		ec.OperationContext,
@@ -1483,7 +1483,7 @@ func (ec *executionContext) fieldContext_User_name(_ context.Context, field grap
 	return graphql.NewScalarFieldContext("User", field, false, false, errors.New("field of type String does not have child fields"))
 }
 
-func (ec *executionContext) _User_age(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+func (ec *executionContext) _User_age(ctx context.Context, field graphql.CollectedField, obj *manualmodels.User) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
 		ec.OperationContext,
@@ -1506,7 +1506,7 @@ func (ec *executionContext) fieldContext_User_age(_ context.Context, field graph
 	return graphql.NewScalarFieldContext("User", field, false, false, errors.New("field of type Int does not have child fields"))
 }
 
-func (ec *executionContext) _User_posts(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+func (ec *executionContext) _User_posts(ctx context.Context, field graphql.CollectedField, obj *manualmodels.User) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
 		ec.OperationContext,
@@ -1518,8 +1518,8 @@ func (ec *executionContext) _User_posts(ctx context.Context, field graphql.Colle
 			return ec.Resolvers.User().Posts(ctx, obj)
 		},
 		nil,
-		func(ctx context.Context, selections ast.SelectionSet, v []*model.Post) graphql.Marshaler {
-			return ec.marshalNPost2ᚕᚖgithubᚗcomᚋtarangrastogiᚋgraphql_gqlgenᚋgraphᚋmodelᚐPostᚄ(ctx, selections, v)
+		func(ctx context.Context, selections ast.SelectionSet, v []*manualmodels.Post) graphql.Marshaler {
+			return ec.marshalNPost2ᚕᚖgithubᚗcomᚋtarangrastogiᚋgraphql_gqlgenᚋinternalᚋmanualmodelᚐPostᚄ(ctx, selections, v)
 		},
 		true,
 		true,
@@ -1538,7 +1538,7 @@ func (ec *executionContext) fieldContext_User_posts(_ context.Context, field gra
 	return fc, nil
 }
 
-func (ec *executionContext) _User_comments(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+func (ec *executionContext) _User_comments(ctx context.Context, field graphql.CollectedField, obj *manualmodels.User) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
 		ec.OperationContext,
@@ -1550,8 +1550,8 @@ func (ec *executionContext) _User_comments(ctx context.Context, field graphql.Co
 			return ec.Resolvers.User().Comments(ctx, obj)
 		},
 		nil,
-		func(ctx context.Context, selections ast.SelectionSet, v []*model.Comment) graphql.Marshaler {
-			return ec.marshalNComment2ᚕᚖgithubᚗcomᚋtarangrastogiᚋgraphql_gqlgenᚋgraphᚋmodelᚐCommentᚄ(ctx, selections, v)
+		func(ctx context.Context, selections ast.SelectionSet, v []*manualmodels.Comment) graphql.Marshaler {
+			return ec.marshalNComment2ᚕᚖgithubᚗcomᚋtarangrastogiᚋgraphql_gqlgenᚋinternalᚋmanualmodelᚐCommentᚄ(ctx, selections, v)
 		},
 		true,
 		true,
@@ -2629,8 +2629,8 @@ func (ec *executionContext) fieldContext___Type_isOneOf(_ context.Context, field
 
 // region    **************************** input.gotpl *****************************
 
-func (ec *executionContext) unmarshalInputCreateCommentInput(ctx context.Context, obj any) (model.CreateCommentInput, error) {
-	var it model.CreateCommentInput
+func (ec *executionContext) unmarshalInputCreateCommentInput(ctx context.Context, obj any) (manualmodels.CreateCommentInput, error) {
+	var it manualmodels.CreateCommentInput
 	if obj == nil {
 		return it, nil
 	}
@@ -2673,8 +2673,8 @@ func (ec *executionContext) unmarshalInputCreateCommentInput(ctx context.Context
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputCreatePostInput(ctx context.Context, obj any) (model.CreatePostInput, error) {
-	var it model.CreatePostInput
+func (ec *executionContext) unmarshalInputCreatePostInput(ctx context.Context, obj any) (manualmodels.CreatePostInput, error) {
+	var it manualmodels.CreatePostInput
 	if obj == nil {
 		return it, nil
 	}
@@ -2717,8 +2717,8 @@ func (ec *executionContext) unmarshalInputCreatePostInput(ctx context.Context, o
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputCreateUserInput(ctx context.Context, obj any) (model.CreateUserInput, error) {
-	var it model.CreateUserInput
+func (ec *executionContext) unmarshalInputCreateUserInput(ctx context.Context, obj any) (manualmodels.CreateUserInput, error) {
+	var it manualmodels.CreateUserInput
 	if obj == nil {
 		return it, nil
 	}
@@ -2764,7 +2764,7 @@ func (ec *executionContext) unmarshalInputCreateUserInput(ctx context.Context, o
 
 var commentImplementors = []string{"Comment"}
 
-func (ec *executionContext) _Comment(ctx context.Context, sel ast.SelectionSet, obj *model.Comment) graphql.Marshaler {
+func (ec *executionContext) _Comment(ctx context.Context, sel ast.SelectionSet, obj *manualmodels.Comment) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, commentImplementors)
 
 	out := graphql.NewFieldSet(fields)
@@ -2945,7 +2945,7 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 
 var postImplementors = []string{"Post"}
 
-func (ec *executionContext) _Post(ctx context.Context, sel ast.SelectionSet, obj *model.Post) graphql.Marshaler {
+func (ec *executionContext) _Post(ctx context.Context, sel ast.SelectionSet, obj *manualmodels.Post) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, postImplementors)
 
 	out := graphql.NewFieldSet(fields)
@@ -3236,7 +3236,7 @@ func (ec *executionContext) _Subscription(ctx context.Context, sel ast.Selection
 
 var userImplementors = []string{"User"}
 
-func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj *model.User) graphql.Marshaler {
+func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj *manualmodels.User) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, userImplementors)
 
 	out := graphql.NewFieldSet(fields)
@@ -3766,15 +3766,15 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
-func (ec *executionContext) marshalNComment2githubᚗcomᚋtarangrastogiᚋgraphql_gqlgenᚋgraphᚋmodelᚐComment(ctx context.Context, sel ast.SelectionSet, v model.Comment) graphql.Marshaler {
+func (ec *executionContext) marshalNComment2githubᚗcomᚋtarangrastogiᚋgraphql_gqlgenᚋinternalᚋmanualmodelᚐComment(ctx context.Context, sel ast.SelectionSet, v manualmodels.Comment) graphql.Marshaler {
 	return ec._Comment(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNComment2ᚕᚖgithubᚗcomᚋtarangrastogiᚋgraphql_gqlgenᚋgraphᚋmodelᚐCommentᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Comment) graphql.Marshaler {
+func (ec *executionContext) marshalNComment2ᚕᚖgithubᚗcomᚋtarangrastogiᚋgraphql_gqlgenᚋinternalᚋmanualmodelᚐCommentᚄ(ctx context.Context, sel ast.SelectionSet, v []*manualmodels.Comment) graphql.Marshaler {
 	ret := graphql.MarshalSliceConcurrently(ctx, len(v), 0, false, func(ctx context.Context, i int) graphql.Marshaler {
 		fc := graphql.GetFieldContext(ctx)
 		fc.Result = &v[i]
-		return ec.marshalNComment2ᚖgithubᚗcomᚋtarangrastogiᚋgraphql_gqlgenᚋgraphᚋmodelᚐComment(ctx, sel, v[i])
+		return ec.marshalNComment2ᚖgithubᚗcomᚋtarangrastogiᚋgraphql_gqlgenᚋinternalᚋmanualmodelᚐComment(ctx, sel, v[i])
 	})
 
 	for _, e := range ret {
@@ -3786,7 +3786,7 @@ func (ec *executionContext) marshalNComment2ᚕᚖgithubᚗcomᚋtarangrastogi�
 	return ret
 }
 
-func (ec *executionContext) marshalNComment2ᚖgithubᚗcomᚋtarangrastogiᚋgraphql_gqlgenᚋgraphᚋmodelᚐComment(ctx context.Context, sel ast.SelectionSet, v *model.Comment) graphql.Marshaler {
+func (ec *executionContext) marshalNComment2ᚖgithubᚗcomᚋtarangrastogiᚋgraphql_gqlgenᚋinternalᚋmanualmodelᚐComment(ctx context.Context, sel ast.SelectionSet, v *manualmodels.Comment) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
@@ -3796,17 +3796,17 @@ func (ec *executionContext) marshalNComment2ᚖgithubᚗcomᚋtarangrastogiᚋgr
 	return ec._Comment(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNCreateCommentInput2githubᚗcomᚋtarangrastogiᚋgraphql_gqlgenᚋgraphᚋmodelᚐCreateCommentInput(ctx context.Context, v any) (model.CreateCommentInput, error) {
+func (ec *executionContext) unmarshalNCreateCommentInput2githubᚗcomᚋtarangrastogiᚋgraphql_gqlgenᚋinternalᚋmanualmodelᚐCreateCommentInput(ctx context.Context, v any) (manualmodels.CreateCommentInput, error) {
 	res, err := ec.unmarshalInputCreateCommentInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNCreatePostInput2githubᚗcomᚋtarangrastogiᚋgraphql_gqlgenᚋgraphᚋmodelᚐCreatePostInput(ctx context.Context, v any) (model.CreatePostInput, error) {
+func (ec *executionContext) unmarshalNCreatePostInput2githubᚗcomᚋtarangrastogiᚋgraphql_gqlgenᚋinternalᚋmanualmodelᚐCreatePostInput(ctx context.Context, v any) (manualmodels.CreatePostInput, error) {
 	res, err := ec.unmarshalInputCreatePostInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNCreateUserInput2githubᚗcomᚋtarangrastogiᚋgraphql_gqlgenᚋgraphᚋmodelᚐCreateUserInput(ctx context.Context, v any) (model.CreateUserInput, error) {
+func (ec *executionContext) unmarshalNCreateUserInput2githubᚗcomᚋtarangrastogiᚋgraphql_gqlgenᚋinternalᚋmanualmodelᚐCreateUserInput(ctx context.Context, v any) (manualmodels.CreateUserInput, error) {
 	res, err := ec.unmarshalInputCreateUserInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
@@ -3843,15 +3843,15 @@ func (ec *executionContext) marshalNInt2int32(ctx context.Context, sel ast.Selec
 	return res
 }
 
-func (ec *executionContext) marshalNPost2githubᚗcomᚋtarangrastogiᚋgraphql_gqlgenᚋgraphᚋmodelᚐPost(ctx context.Context, sel ast.SelectionSet, v model.Post) graphql.Marshaler {
+func (ec *executionContext) marshalNPost2githubᚗcomᚋtarangrastogiᚋgraphql_gqlgenᚋinternalᚋmanualmodelᚐPost(ctx context.Context, sel ast.SelectionSet, v manualmodels.Post) graphql.Marshaler {
 	return ec._Post(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNPost2ᚕᚖgithubᚗcomᚋtarangrastogiᚋgraphql_gqlgenᚋgraphᚋmodelᚐPostᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Post) graphql.Marshaler {
+func (ec *executionContext) marshalNPost2ᚕᚖgithubᚗcomᚋtarangrastogiᚋgraphql_gqlgenᚋinternalᚋmanualmodelᚐPostᚄ(ctx context.Context, sel ast.SelectionSet, v []*manualmodels.Post) graphql.Marshaler {
 	ret := graphql.MarshalSliceConcurrently(ctx, len(v), 0, false, func(ctx context.Context, i int) graphql.Marshaler {
 		fc := graphql.GetFieldContext(ctx)
 		fc.Result = &v[i]
-		return ec.marshalNPost2ᚖgithubᚗcomᚋtarangrastogiᚋgraphql_gqlgenᚋgraphᚋmodelᚐPost(ctx, sel, v[i])
+		return ec.marshalNPost2ᚖgithubᚗcomᚋtarangrastogiᚋgraphql_gqlgenᚋinternalᚋmanualmodelᚐPost(ctx, sel, v[i])
 	})
 
 	for _, e := range ret {
@@ -3863,7 +3863,7 @@ func (ec *executionContext) marshalNPost2ᚕᚖgithubᚗcomᚋtarangrastogiᚋgr
 	return ret
 }
 
-func (ec *executionContext) marshalNPost2ᚖgithubᚗcomᚋtarangrastogiᚋgraphql_gqlgenᚋgraphᚋmodelᚐPost(ctx context.Context, sel ast.SelectionSet, v *model.Post) graphql.Marshaler {
+func (ec *executionContext) marshalNPost2ᚖgithubᚗcomᚋtarangrastogiᚋgraphql_gqlgenᚋinternalᚋmanualmodelᚐPost(ctx context.Context, sel ast.SelectionSet, v *manualmodels.Post) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
@@ -3889,15 +3889,15 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 	return res
 }
 
-func (ec *executionContext) marshalNUser2githubᚗcomᚋtarangrastogiᚋgraphql_gqlgenᚋgraphᚋmodelᚐUser(ctx context.Context, sel ast.SelectionSet, v model.User) graphql.Marshaler {
+func (ec *executionContext) marshalNUser2githubᚗcomᚋtarangrastogiᚋgraphql_gqlgenᚋinternalᚋmanualmodelᚐUser(ctx context.Context, sel ast.SelectionSet, v manualmodels.User) graphql.Marshaler {
 	return ec._User(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNUser2ᚕᚖgithubᚗcomᚋtarangrastogiᚋgraphql_gqlgenᚋgraphᚋmodelᚐUserᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.User) graphql.Marshaler {
+func (ec *executionContext) marshalNUser2ᚕᚖgithubᚗcomᚋtarangrastogiᚋgraphql_gqlgenᚋinternalᚋmanualmodelᚐUserᚄ(ctx context.Context, sel ast.SelectionSet, v []*manualmodels.User) graphql.Marshaler {
 	ret := graphql.MarshalSliceConcurrently(ctx, len(v), 0, false, func(ctx context.Context, i int) graphql.Marshaler {
 		fc := graphql.GetFieldContext(ctx)
 		fc.Result = &v[i]
-		return ec.marshalNUser2ᚖgithubᚗcomᚋtarangrastogiᚋgraphql_gqlgenᚋgraphᚋmodelᚐUser(ctx, sel, v[i])
+		return ec.marshalNUser2ᚖgithubᚗcomᚋtarangrastogiᚋgraphql_gqlgenᚋinternalᚋmanualmodelᚐUser(ctx, sel, v[i])
 	})
 
 	for _, e := range ret {
@@ -3909,7 +3909,7 @@ func (ec *executionContext) marshalNUser2ᚕᚖgithubᚗcomᚋtarangrastogiᚋgr
 	return ret
 }
 
-func (ec *executionContext) marshalNUser2ᚖgithubᚗcomᚋtarangrastogiᚋgraphql_gqlgenᚋgraphᚋmodelᚐUser(ctx context.Context, sel ast.SelectionSet, v *model.User) graphql.Marshaler {
+func (ec *executionContext) marshalNUser2ᚖgithubᚗcomᚋtarangrastogiᚋgraphql_gqlgenᚋinternalᚋmanualmodelᚐUser(ctx context.Context, sel ast.SelectionSet, v *manualmodels.User) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
@@ -4090,7 +4090,7 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	return res
 }
 
-func (ec *executionContext) marshalOPost2ᚖgithubᚗcomᚋtarangrastogiᚋgraphql_gqlgenᚋgraphᚋmodelᚐPost(ctx context.Context, sel ast.SelectionSet, v *model.Post) graphql.Marshaler {
+func (ec *executionContext) marshalOPost2ᚖgithubᚗcomᚋtarangrastogiᚋgraphql_gqlgenᚋinternalᚋmanualmodelᚐPost(ctx context.Context, sel ast.SelectionSet, v *manualmodels.Post) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -4115,7 +4115,7 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 	return res
 }
 
-func (ec *executionContext) marshalOUser2ᚖgithubᚗcomᚋtarangrastogiᚋgraphql_gqlgenᚋgraphᚋmodelᚐUser(ctx context.Context, sel ast.SelectionSet, v *model.User) graphql.Marshaler {
+func (ec *executionContext) marshalOUser2ᚖgithubᚗcomᚋtarangrastogiᚋgraphql_gqlgenᚋinternalᚋmanualmodelᚐUser(ctx context.Context, sel ast.SelectionSet, v *manualmodels.User) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}

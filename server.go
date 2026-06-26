@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -12,23 +13,32 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/tarangrastogi/graphql_gqlgen/graph"
-	"github.com/tarangrastogi/graphql_gqlgen/graph/model"
 	"github.com/tarangrastogi/graphql_gqlgen/internal/db"
+	manualmodels "github.com/tarangrastogi/graphql_gqlgen/internal/manualmodel"
 	"github.com/tarangrastogi/graphql_gqlgen/internal/repository"
 	"github.com/tarangrastogi/graphql_gqlgen/internal/service"
 	"github.com/vektah/gqlparser/v2/ast"
+
+	"github.com/joho/godotenv"
 )
 
 const defaultPort = "8080"
 
 func main() {
-
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = defaultPort
 	}
-
-	pool , err :=  db.NewPostgresConnection()
+	fmt.Println("HOST:", os.Getenv("DB_HOST"))
+	fmt.Println("PORT:", os.Getenv("DB_PORT"))
+	fmt.Println("USER:", os.Getenv("DB_USER"))
+	fmt.Println("PASSWORD:", os.Getenv("DB_PASSWORD"))
+	fmt.Println("DB:", os.Getenv("DB_NAME"))
+	pool, err := db.NewPostgresConnection()
 
 	if err != nil {
 		log.Fatal(err)
@@ -38,19 +48,17 @@ func main() {
 	postRepo := repository.NewPostRepository(pool)
 	commentRepo := repository.NewCommentRepository(pool)
 
-
 	userService := service.NewUserService(userRepo)
-	postService := service.NewPostService(postRepo ,  userRepo)
-	commentService := service.NewCommentService(commentRepo , userRepo , postRepo)
-
+	postService := service.NewPostService(postRepo, userRepo)
+	commentService := service.NewCommentService(commentRepo, userRepo, postRepo)
 
 	srv := handler.New(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{
-		UserCreatedChan:    make(chan *model.User),
-		PostCreatedChan:    make(chan *model.Post),
-		CommentCreatedChan: make(chan *model.Comment),
-		UserService: userService,
-		PostService: postService,
-		CommentService: commentService,
+		UserCreatedChan:    make(chan *manualmodels.User),
+		PostCreatedChan:    make(chan *manualmodels.Post),
+		CommentCreatedChan: make(chan *manualmodels.Comment),
+		UserService:        userService,
+		PostService:        postService,
+		CommentService:     commentService,
 	}}))
 
 	srv.AddTransport(transport.Options{})

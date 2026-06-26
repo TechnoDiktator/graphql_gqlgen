@@ -2,51 +2,11 @@
 
 package model
 
-type Comment struct {
-	ID      string `json:"id"`
-	Content string `json:"content"`
-	Post    *Post  `json:"post"`
-	Author  *User  `json:"author"`
-}
-
-type CreateCommentInput struct {
-	PostID  string `json:"postId"`
-	UserID  string `json:"userId"`
-	Content string `json:"content"`
-}
-
-type CreatePostInput struct {
-	UserID  string `json:"userId"`
-	Title   string `json:"title"`
-	Content string `json:"content"`
-}
-
-type CreateUserInput struct {
-	Name string `json:"name"`
-	Age  int32  `json:"age"`
-}
-
 type Mutation struct {
-}
-
-type Post struct {
-	ID       string     `json:"id"`
-	Title    string     `json:"title"`
-	Content  string     `json:"content"`
-	Author   *User      `json:"author"`
-	Comments []*Comment `json:"comments"`
 }
 
 type Query struct {
 }
 
 type Subscription struct {
-}
-
-type User struct {
-	ID       string     `json:"id"`
-	Name     string     `json:"name"`
-	Age      int32      `json:"age"`
-	Posts    []*Post    `json:"posts"`
-	Comments []*Comment `json:"comments"`
 }

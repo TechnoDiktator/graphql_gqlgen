@@ -3,15 +3,15 @@ package mapper
 import (
 	"strconv"
 
-	"github.com/tarangrastogi/graphql_gqlgen/graph/model"
+	"github.com/tarangrastogi/graphql_gqlgen/internal/manualmodel"
 	entity "github.com/tarangrastogi/graphql_gqlgen/internal/db_models"
 )
 
-func ToGraphQLUser(u *entity.User) *model.User {
+func ToGraphQLUser(u *entity.User) *manualmodels.User {
 	if u == nil {
 		return  nil 
 	}
-	return &model.User{
+	return &manualmodels.User{
 		ID: strconv.FormatInt(u.ID , 10),
 		Name : u.Name,
 		Age : int32(u.Age),
@@ -20,16 +20,16 @@ func ToGraphQLUser(u *entity.User) *model.User {
 }
 
 
-func ToEntityUser(input model.CreateUserInput) *entity.User {
+func ToEntityUser(input manualmodels.CreateUserInput) *entity.User {
 	return &entity.User{
 		Name: input.Name,
 		Age:  int(input.Age),
 	}
 }
 
-func ToGraphQLUsers(users []*entity.User) []*model.User {
+func ToGraphQLUsers(users []*entity.User) []*manualmodels.User {
 
-	result := make([]*model.User, 0, len(users))
+	result := make([]*manualmodels.User, 0, len(users))
 
 	for _, user := range users {
 		result = append(result, ToGraphQLUser(user))

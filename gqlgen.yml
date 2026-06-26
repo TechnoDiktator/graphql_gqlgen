@@ -194,6 +194,8 @@ models:
       - github.com/99designs/gqlgen/graphql.Int
       - github.com/99designs/gqlgen/graphql.Int64
   User:
+    model:
+      - github.com/tarangrastogi/graphql_gqlgen/internal/manualmodel.User
     fields:
       posts:
         resolver: true
@@ -201,17 +203,34 @@ models:
         resolver: true
   
   Post:
+    model:
+      - github.com/tarangrastogi/graphql_gqlgen/internal/manualmodel.Post
     fields:
       author:
         resolver: true
       comments:
         resolver: true
-        
+
   Comment:
+    model:
+      - github.com/tarangrastogi/graphql_gqlgen/internal/manualmodel.Comment
     fields:
       post:
         resolver: true
       author:
         resolver: true
+
+  CreateUserInput:
+    model:
+      - github.com/tarangrastogi/graphql_gqlgen/internal/manualmodel.CreateUserInput
+
+  CreatePostInput:
+    model:
+      - github.com/tarangrastogi/graphql_gqlgen/internal/manualmodel.CreatePostInput
+
+  CreateCommentInput:
+    model:
+      - github.com/tarangrastogi/graphql_gqlgen/internal/manualmodel.CreateCommentInput
+
 
         

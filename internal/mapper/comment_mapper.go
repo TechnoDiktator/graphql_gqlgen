@@ -4,22 +4,24 @@ import (
 	"strconv"
 
 	entity "github.com/tarangrastogi/graphql_gqlgen/internal/db_models"
-	"github.com/tarangrastogi/graphql_gqlgen/graph/model"
+	"github.com/tarangrastogi/graphql_gqlgen/internal/manualmodel"
 )
 
-func ToGraphQLComment(comment *entity.Comment) *model.Comment {
+func ToGraphQLComment(comment *entity.Comment) *manualmodels.Comment {
 
 	if comment == nil {
 		return nil
 	}
 
-	return &model.Comment{
+	return &manualmodels.Comment{
 		ID:      strconv.FormatInt(comment.ID, 10),
 		Content: comment.Content,
+		PostID: strconv.FormatInt(comment.PostID , 10),
+		UserID: strconv.FormatInt(comment.UserID , 10),
 	}
 }
 
-func ToEntityComment(input model.CreateCommentInput) (*entity.Comment , error) {
+func ToEntityComment(input manualmodels.CreateCommentInput) (*entity.Comment , error) {
 
 	userID, err := strconv.ParseInt(input.UserID, 10, 64)
 	
@@ -39,9 +41,12 @@ func ToEntityComment(input model.CreateCommentInput) (*entity.Comment , error) {
 	} , nil
 }
 
-func ToGraphQLComments(comments []*entity.Comment) []*model.Comment {
+func ToGraphQLComments(comments []*entity.Comment) []*manualmodels.Comment {
+	if comments == nil {
+		return []*manualmodels.Comment{}
+	}
 
-	result := make([]*model.Comment, 0, len(comments))
+	result := make([]*manualmodels.Comment, 0, len(comments))
 
 	for _, comment := range comments {
 		result = append(result, ToGraphQLComment(comment))

@@ -1,7 +1,7 @@
 package graph
 
 import (
-	"github.com/tarangrastogi/graphql_gqlgen/graph/model"
+	manualmodels "github.com/tarangrastogi/graphql_gqlgen/internal/manualmodel"
 	"github.com/tarangrastogi/graphql_gqlgen/internal/service"
 )
 
@@ -16,7 +16,7 @@ type Resolver struct {
 	PostService    *service.PostService
 	CommentService *service.CommentService
 
-	UserCreatedChan    chan *model.User
-	PostCreatedChan    chan *model.Post
-	CommentCreatedChan chan *model.Comment
+	UserCreatedChan    chan *manualmodels.User
+	PostCreatedChan    chan *manualmodels.Post
+	CommentCreatedChan chan *manualmodels.Comment
 }

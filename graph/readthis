@@ -1,0 +1,140 @@
+Exactly. This is actually a major milestone in your project.
+
+Earlier, your resolvers were using the generated models:
+
+Resolver
+    ↓
+graph/model (generated)
+    ↓
+Mapper
+    ↓
+entity
+    ↓
+Service
+    ↓
+Repository
+    ↓
+PostgreSQL
+
+Now they will use your own models:
+
+Resolver
+    ↓
+manualmodel (your models)
+    ↓
+Mapper
+    ↓
+entity
+    ↓
+Service
+    ↓
+Repository
+    ↓
+PostgreSQL
+
+Nothing about the architecture changes—only the GraphQL model layer changes.
+
+
+
+
+Yes, and that's expected behavior.
+
+These are root GraphQL types, not data models.
+
+type Query struct {
+}
+
+type Mutation struct {
+}
+
+type Subscription struct {
+}
+
+They are essentially marker types that gqlgen uses internally to build the GraphQL schema.
+
+For example, when you implement
+
+func (r *Resolver) Query() QueryResolver {
+    return &queryResolver{r}
+}
+
+the generated code associates your queryResolver with this generated Query type.
+
+Why are they still generated?
+
+Because you didn't provide your own Go types for them in gqlgen.yml.
+
+You mapped
+
+User
+Post
+Comment
+CreateUserInput
+CreatePostInput
+CreateCommentInput
+
+but you did not map
+
+Query
+Mutation
+Subscription
+
+So gqlgen generates them automatically.
+
+Should you create your own?
+
+No.
+
+These structs:
+
+type Query struct{}
+type Mutation struct{}
+type Subscription struct{}
+
+carry no data.
+
+They're never returned from the database, never mapped, and never contain business logic.
+
+Creating your own versions provides essentially no benefit.
+
+In production
+
+Almost every gqlgen project leaves these generated.
+
+Only the actual GraphQL object types are customized.
+
+So it's perfectly normal to have:
+
+internal/
+    manualmodel/
+        User
+        Post
+        Comment
+        CreateUserInput
+        ...
+
+graph/model/models_gen.go
+    Query
+    Mutation
+    Subscription
+My recommendation
+
+I would leave them exactly as they are.
+
+The only types worth owning yourself are the ones that:
+
+need hidden fields (UserID, PostID)
+are mapped from entities
+are returned by resolvers
+are accepted as resolver inputs
+
+Those are:
+
+✅ User
+✅ Post
+✅ Comment
+✅ CreateUserInput
+✅ CreatePostInput
+✅ CreateCommentInput
+
+Everything else (Query, Mutation, Subscription) can remain generated. That's the approach used in most gqlgen codebases because those types are just placeholders and don't benefit from customization.
