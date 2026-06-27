@@ -1,9 +1,3 @@
-package auth
-
-
-
-
-
 
 // Claims are simply the data stored inside a JWT.
 
@@ -60,3 +54,39 @@ package auth
 // }
 
 // These are custom claims.
+
+
+package auth
+
+import "context"
+
+type contextKey string
+
+const ClaimsContextKey contextKey = "claims"
+
+func WithClaims(
+	ctx context.Context,
+	claims *Claims,
+) context.Context {
+
+	return context.WithValue(
+		ctx,
+		ClaimsContextKey,
+		claims,
+	)
+}
+
+func ForContext(
+	ctx context.Context,
+) *Claims {
+
+	claims, ok := ctx.Value(
+		ClaimsContextKey,
+	).(*Claims)
+
+	if !ok {
+		return nil
+	}
+
+	return claims
+}

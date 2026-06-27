@@ -5,56 +5,37 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/tarangrastogi/graphql_gqlgen/internal/auth"
 	manualmodels "github.com/tarangrastogi/graphql_gqlgen/internal/manualmodel"
 	"github.com/tarangrastogi/graphql_gqlgen/internal/mapper"
 )
 
-// CreateUser is the resolver for the createUser field.
-func (r *mutationResolver) CreateUser(ctx context.Context, input manualmodels.CreateUserInput) (*manualmodels.User, error) {
-	//panic(fmt.Errorf("not implemented: CreateUser - createUser"))
-
-	log.Printf(
-		"[Resolver] Mutation.CreateUser | name=%s age=%d",
-		input.Name,
-		input.Age,
-	)
-
-	entityUser := mapper.ToEntityUser(input)
-
-	user, err := r.UserService.Create(ctx, entityUser)
-	if err != nil {
-		return nil, err
-	}
-
-	graphqluser := mapper.ToGraphQLUser(user)
-
-	go func() {
-		log.Println("Publishing user")
-		r.UserCreatedChan <- graphqluser
-	}()
-	return graphqluser, nil
-}
-
 // CreatePost is the resolver for the createPost field.
-func (r *mutationResolver) CreatePost(ctx context.Context, input manualmodels.CreatePostInput) (*manualmodels.Post, error) {
-	//panic(fmt.Errorf("not implemented: CreatePost - createPost"))
+func (r *mutationResolver) CreatePost(
+	ctx context.Context,
+	input manualmodels.CreatePostInput,
+) (*manualmodels.Post, error) {
+
 	log.Printf(
-		"[Resolver] Mutation.CreatePost | userID=%s title=%q",
-		input.UserID,
+		"[Resolver] Mutation.CreatePost | title=%q",
 		input.Title,
 	)
 
-	fmt.Printf("\n gql model object %s", input)
-	entityPost, err := mapper.ToEntityPost(input)
-	if err != nil {
-		return nil, err
+	claims := auth.ForContext(ctx)
+	if claims == nil {
+		return nil, fmt.Errorf("unauthenticated")
 	}
-	fmt.Printf("\n db entity created %s", entityPost)
+
+	entityPost := mapper.ToEntityPost(
+		input,
+		claims.UserID,
+	)
+
 	post, err := r.PostService.Create(ctx, entityPost)
 	if err != nil {
 		return nil, err
 	}
-	fmt.Printf("\n db object created %s", input)
+
 	gqlPost := mapper.ToGraphQLPost(post)
 
 	go func() {
@@ -66,19 +47,33 @@ func (r *mutationResolver) CreatePost(ctx context.Context, input manualmodels.Cr
 }
 
 // CreateComment is the resolver for the createComment field.
-func (r *mutationResolver) CreateComment(ctx context.Context, input manualmodels.CreateCommentInput) (*manualmodels.Comment, error) {
-	//panic(fmt.Errorf("not implemented: CreateComment - createComment"))
+func (r *mutationResolver) CreateComment(
+	ctx context.Context,
+	input manualmodels.CreateCommentInput,
+) (*manualmodels.Comment, error) {
+
 	log.Printf(
-		"[Resolver] Mutation.CreateComment | postID=%s userID=%s",
+		"[Resolver] Mutation.CreateComment | postID=%s",
 		input.PostID,
-		input.UserID,
 	)
-	entityComment, err := mapper.ToEntityComment(input)
+
+	claims := auth.ForContext(ctx)
+	if claims == nil {
+		return nil, fmt.Errorf("unauthenticated")
+	}
+
+	entityComment, err := mapper.ToEntityComment(
+		input,
+		claims.UserID,
+	)
 	if err != nil {
 		return nil, err
 	}
 
-	comment, err := r.CommentService.Create(ctx, entityComment)
+	comment, err := r.CommentService.Create(
+		ctx,
+		entityComment,
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -86,7 +81,7 @@ func (r *mutationResolver) CreateComment(ctx context.Context, input manualmodels
 	gqlComment := mapper.ToGraphQLComment(comment)
 
 	go func() {
-		log.Println("Publishing the commnet created just now ")
+		log.Println("Publishing comment created")
 		r.CommentCreatedChan <- gqlComment
 	}()
 
@@ -94,11 +89,56 @@ func (r *mutationResolver) CreateComment(ctx context.Context, input manualmodels
 }
 
 // Register is the resolver for the register field.
-func (r *mutationResolver) Register(ctx context.Context, input manualmodels.RegisterInput) (*manualmodels.AuthPayload, error) {
-	panic(fmt.Errorf("not implemented: Register - register"))
+func (r *mutationResolver) Register(
+	ctx context.Context,
+	input manualmodels.RegisterInput,
+) (*manualmodels.AuthPayload, error) {
+
+	user, err := r.UserService.Register(ctx, input)
+	if err != nil {
+		return nil, err
+	}
+
+	token, err := auth.GenerateToken(
+		user.ID,
+		user.Email,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	go func() {
+		log.Println("Publishing user")
+		r.UserCreatedChan <- mapper.ToGraphQLUser(user)
+	}()
+
+	return &manualmodels.AuthPayload{
+		Token: token,
+		User:  mapper.ToGraphQLUser(user),
+	}, nil
 }
 
 // Login is the resolver for the login field.
-func (r *mutationResolver) Login(ctx context.Context, input manualmodels.LoginInput) (*manualmodels.AuthPayload, error) {
-	panic(fmt.Errorf("not implemented: Login - login"))
+func (r *mutationResolver) Login(
+	ctx context.Context,
+	input manualmodels.LoginInput,
+) (*manualmodels.AuthPayload, error) {
+
+	user, err := r.UserService.Login(ctx, input)
+	if err != nil {
+		return nil, err
+	}
+
+	token, err := auth.GenerateToken(
+		user.ID,
+		user.Email,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &manualmodels.AuthPayload{
+		Token: token,
+		User:  mapper.ToGraphQLUser(user),
+	}, nil
 }

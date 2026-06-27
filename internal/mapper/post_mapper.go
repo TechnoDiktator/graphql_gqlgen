@@ -17,13 +17,17 @@ func ToGraphQLPost(post *entity.Post) *manualmodels.Post {
 	}
 }
 
-func ToEntityPost(input manualmodels.CreatePostInput) *entity.Post {
+func ToEntityPost(
+	input manualmodels.CreatePostInput,
+	userID int64,
+) *entity.Post {
+
 	return &entity.Post{
+		UserID:  userID,
 		Title:   input.Title,
 		Content: input.Content,
 	}
 }
-
 
 func ToGraphQLPosts(posts []*entity.Post) []*manualmodels.Post {
 

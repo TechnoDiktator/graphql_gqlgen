@@ -43,14 +43,20 @@ func (s *postService) Create(
 	post *entity.Post,
 ) (*entity.Post, error) {
 
-	// Business logic can be added here later:
-	// - Validate the user exists.
-	// - Check permissions.
-	// - Sanitize content.
+	// Ensure the user exists
+	_, err := s.userRepo.GetByID(ctx, post.UserID)
+	if err != nil {
+		return nil, err
+	}
+
+	// Future business rules:
+	// - title length
+	// - profanity filter
+	// - post limits
+	// - permissions
 
 	return s.postRepo.Create(ctx, post)
 }
-
 // GetByID fetches a post by its ID.
 func (s *postService) GetByID(
 	ctx context.Context,

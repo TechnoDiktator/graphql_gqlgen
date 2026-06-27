@@ -35,16 +35,20 @@ func NewCommentService(
 	}
 }
 
-// Create creates a new comment.
 func (s *commentService) Create(
 	ctx context.Context,
 	comment *entity.Comment,
 ) (*entity.Comment, error) {
 
-	// Business logic can be added here later:
-	// - Verify the user exists.
-	// - Verify the post exists.
-	// - Check if commenting is allowed.
+	// Verify user exists
+	if _, err := s.userRepo.GetByID(ctx, comment.UserID); err != nil {
+		return nil, err
+	}
+
+	// Verify post exists
+	if _, err := s.postRepo.GetByID(ctx, comment.PostID); err != nil {
+		return nil, err
+	}
 
 	return s.commentRepo.Create(ctx, comment)
 }

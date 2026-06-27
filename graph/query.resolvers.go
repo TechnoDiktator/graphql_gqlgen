@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/tarangrastogi/graphql_gqlgen/internal/auth"
 	manualmodels "github.com/tarangrastogi/graphql_gqlgen/internal/manualmodel"
 	"github.com/tarangrastogi/graphql_gqlgen/internal/mapper"
 )
@@ -67,5 +68,21 @@ func (r *queryResolver) Post(ctx context.Context, id string) (*manualmodels.Post
 
 // Me is the resolver for the me field.
 func (r *queryResolver) Me(ctx context.Context) (*manualmodels.User, error) {
-	panic(fmt.Errorf("not implemented: Me - me"))
+	//panic(fmt.Errorf("not implemented: Me - me"))
+	claims := auth.ForContext(ctx)
+
+	if claims ==  nil {
+		return nil ,  fmt.Errorf("unauthorized")
+	}
+	
+	user , err := r.UserService.GetByID(ctx , claims.UserID)
+	
+	if err != nil {
+		return  nil ,  err
+
+	}
+
+
+	return mapper.ToGraphQLUser(user) , nil
+
 }

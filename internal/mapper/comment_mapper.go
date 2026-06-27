@@ -21,7 +21,10 @@ func ToGraphQLComment(comment *entity.Comment) *manualmodels.Comment {
 	}
 }
 
-func ToEntityComment(input manualmodels.CreateCommentInput) (*entity.Comment, error) {
+func ToEntityComment(
+	input manualmodels.CreateCommentInput,
+	userID int64,
+) (*entity.Comment, error) {
 
 	postID, err := strconv.ParseInt(input.PostID, 10, 64)
 	if err != nil {
@@ -29,11 +32,11 @@ func ToEntityComment(input manualmodels.CreateCommentInput) (*entity.Comment, er
 	}
 
 	return &entity.Comment{
+		UserID:  userID,
 		PostID:  postID,
 		Content: input.Content,
 	}, nil
 }
-
 func ToGraphQLComments(comments []*entity.Comment) []*manualmodels.Comment {
 	if comments == nil {
 		return []*manualmodels.Comment{}
