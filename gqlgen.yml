@@ -201,7 +201,7 @@ models:
         resolver: true
       comments:
         resolver: true
-  
+
   Post:
     model:
       - github.com/tarangrastogi/graphql_gqlgen/internal/manualmodel.Post
@@ -220,9 +220,17 @@ models:
       author:
         resolver: true
 
-  CreateUserInput:
+  RegisterInput:
     model:
-      - github.com/tarangrastogi/graphql_gqlgen/internal/manualmodel.CreateUserInput
+      - github.com/tarangrastogi/graphql_gqlgen/internal/manualmodel.RegisterInput
+
+  LoginInput:
+    model:
+      - github.com/tarangrastogi/graphql_gqlgen/internal/manualmodel.LoginInput
+
+  AuthPayload:
+    model:
+      - github.com/tarangrastogi/graphql_gqlgen/internal/manualmodel.AuthPayload
 
   CreatePostInput:
     model:

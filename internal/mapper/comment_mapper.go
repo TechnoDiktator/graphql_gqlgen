@@ -4,7 +4,7 @@ import (
 	"strconv"
 
 	entity "github.com/tarangrastogi/graphql_gqlgen/internal/db_models"
-	"github.com/tarangrastogi/graphql_gqlgen/internal/manualmodel"
+	manualmodels "github.com/tarangrastogi/graphql_gqlgen/internal/manualmodel"
 )
 
 func ToGraphQLComment(comment *entity.Comment) *manualmodels.Comment {
@@ -16,29 +16,22 @@ func ToGraphQLComment(comment *entity.Comment) *manualmodels.Comment {
 	return &manualmodels.Comment{
 		ID:      strconv.FormatInt(comment.ID, 10),
 		Content: comment.Content,
-		PostID: strconv.FormatInt(comment.PostID , 10),
-		UserID: strconv.FormatInt(comment.UserID , 10),
+		PostID:  strconv.FormatInt(comment.PostID, 10),
+		UserID:  strconv.FormatInt(comment.UserID, 10),
 	}
 }
 
-func ToEntityComment(input manualmodels.CreateCommentInput) (*entity.Comment , error) {
-
-	userID, err := strconv.ParseInt(input.UserID, 10, 64)
-	
-	if err != nil {
-		return nil , err
-	}
+func ToEntityComment(input manualmodels.CreateCommentInput) (*entity.Comment, error) {
 
 	postID, err := strconv.ParseInt(input.PostID, 10, 64)
 	if err != nil {
-			return nil , err
+		return nil, err
 	}
 
 	return &entity.Comment{
-		UserID:  userID,
 		PostID:  postID,
 		Content: input.Content,
-	} , nil
+	}, nil
 }
 
 func ToGraphQLComments(comments []*entity.Comment) []*manualmodels.Comment {

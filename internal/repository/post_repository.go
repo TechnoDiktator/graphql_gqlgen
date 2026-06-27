@@ -2,7 +2,6 @@ package repository
 
 import (
 	context "context"
-	"fmt"
 
 	entity "github.com/tarangrastogi/graphql_gqlgen/internal/db_models"
 
@@ -39,7 +38,13 @@ func (r *postRepository) Create(
 	query := `
 	INSERT INTO posts(user_id, title, content)
 	VALUES ($1, $2, $3)
-	RETURNING id
+	RETURNING
+		id,
+		user_id,
+		title,
+		content,
+		created_at,
+		updated_at
 	`
 
 	err := r.db.QueryRow(
@@ -48,7 +53,14 @@ func (r *postRepository) Create(
 		post.UserID,
 		post.Title,
 		post.Content,
-	).Scan(&post.ID)
+	).Scan(
+		&post.ID,
+		&post.UserID,
+		&post.Title,
+		&post.Content,
+		&post.CreatedAt,
+		&post.UpdatedAt,
+	)
 
 	if err != nil {
 		return nil, err
@@ -56,12 +68,21 @@ func (r *postRepository) Create(
 
 	return post, nil
 }
-func (r *postRepository) GetByID(ctx context.Context, id int64) (*entity.Post, error) {
+func (r *postRepository) GetByID(
+	ctx context.Context,
+	id int64,
+) (*entity.Post, error) {
 
 	query := `
-		SELECT id, user_id, title, content
-		FROM posts
-		WHERE id = $1
+	SELECT
+		id,
+		user_id,
+		title,
+		content,
+		created_at,
+		updated_at
+	FROM posts
+	WHERE id = $1
 	`
 
 	post := &entity.Post{}
@@ -75,6 +96,8 @@ func (r *postRepository) GetByID(ctx context.Context, id int64) (*entity.Post, e
 		&post.UserID,
 		&post.Title,
 		&post.Content,
+		&post.CreatedAt,
+		&post.UpdatedAt,
 	)
 
 	if err != nil {
@@ -83,15 +106,22 @@ func (r *postRepository) GetByID(ctx context.Context, id int64) (*entity.Post, e
 
 	return post, nil
 }
-
-func (r *postRepository) GetAll(ctx context.Context) ([]*entity.Post, error) {
+func (r *postRepository) GetAll(
+	ctx context.Context,
+) ([]*entity.Post, error) {
 
 	query := `
-		SELECT id, user_id, title, content
-		FROM posts
+	SELECT
+		id,
+		user_id,
+		title,
+		content,
+		created_at,
+		updated_at
+	FROM posts
 	`
-	rows, err := r.db.Query(ctx, query)
 
+	rows, err := r.db.Query(ctx, query)
 	if err != nil {
 		return nil, err
 	}
@@ -100,41 +130,7 @@ func (r *postRepository) GetAll(ctx context.Context) ([]*entity.Post, error) {
 	posts := []*entity.Post{}
 
 	for rows.Next() {
-		post := &entity.Post{}
-		err := rows.Scan(
-			&post.ID,
-			&post.UserID,
-			&post.Title,
-			&post.Content,
-		)
-		if err != nil {
-			return nil, err
-		}
-		posts = append(posts, post)
-	}
-	return posts, nil
-}
 
-func (r *postRepository) GetByUserID(
-	ctx context.Context,
-	userID int64,
-) ([]*entity.Post, error) {
-
-	query := `
-		SELECT id, user_id, title, content
-		FROM posts
-		WHERE user_id = $1
-	`
-
-	rows, err := r.db.Query(ctx, query, userID)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	posts := make([]*entity.Post, 0)
-
-	for rows.Next() {
 		post := &entity.Post{}
 
 		err := rows.Scan(
@@ -142,6 +138,8 @@ func (r *postRepository) GetByUserID(
 			&post.UserID,
 			&post.Title,
 			&post.Content,
+			&post.CreatedAt,
+			&post.UpdatedAt,
 		)
 		if err != nil {
 			return nil, err
@@ -157,6 +155,104 @@ func (r *postRepository) GetByUserID(
 	return posts, nil
 }
 
-func (r *postRepository) GetByIDs(ctx context.Context, ids []int64) ([]*entity.Post, error) {
-	return nil, fmt.Errorf("not implemented getBYIDs Yet")
+func (r *postRepository) GetByUserID(
+	ctx context.Context,
+	userID int64,
+) ([]*entity.Post, error) {
+
+	query := `
+	SELECT
+		id,
+		user_id,
+		title,
+		content,
+		created_at,
+		updated_at
+	FROM posts
+	WHERE user_id = $1
+	`
+
+	rows, err := r.db.Query(ctx, query, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	posts := []*entity.Post{}
+
+	for rows.Next() {
+
+		post := &entity.Post{}
+
+		err := rows.Scan(
+			&post.ID,
+			&post.UserID,
+			&post.Title,
+			&post.Content,
+			&post.CreatedAt,
+			&post.UpdatedAt,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		posts = append(posts, post)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return posts, nil
+}
+
+func (r *postRepository) GetByIDs(
+	ctx context.Context,
+	ids []int64,
+) ([]*entity.Post, error) {
+
+	query := `
+	SELECT
+		id,
+		user_id,
+		title,
+		content,
+		created_at,
+		updated_at
+	FROM posts
+	WHERE id = ANY($1)
+	`
+
+	rows, err := r.db.Query(ctx, query, ids)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	posts := make([]*entity.Post, 0, len(ids))
+
+	for rows.Next() {
+
+		post := &entity.Post{}
+
+		err := rows.Scan(
+			&post.ID,
+			&post.UserID,
+			&post.Title,
+			&post.Content,
+			&post.CreatedAt,
+			&post.UpdatedAt,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		posts = append(posts, post)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return posts, nil
 }

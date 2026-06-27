@@ -21,7 +21,6 @@ type Post struct {
 
 
 type CreatePostInput struct {
-	UserID  string `json:"userId"`
 	Title   string `json:"title"`
 	Content string `json:"content"`
 }

@@ -16,19 +16,14 @@ func ToGraphQLPost(post *entity.Post) *manualmodels.Post {
 		UserID: strconv.FormatInt(post.UserID, 10), // <-- REQUIRED
 	}
 }
-func ToEntityPost(input manualmodels.CreatePostInput) (*entity.Post, error) {
 
-	userID, err := strconv.ParseInt(input.UserID, 10, 64)
-	if err != nil {
-		return nil, err
-	}
-
+func ToEntityPost(input manualmodels.CreatePostInput) *entity.Post {
 	return &entity.Post{
-		UserID:  userID,
 		Title:   input.Title,
 		Content: input.Content,
-	}, nil
+	}
 }
+
 
 func ToGraphQLPosts(posts []*entity.Post) []*manualmodels.Post {
 

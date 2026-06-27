@@ -29,7 +29,7 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input manualmodels.Cr
 	graphqluser := mapper.ToGraphQLUser(user)
 
 	go func() {
-		log.Panicln("Publishing user")
+		log.Println("Publishing user")
 		r.UserCreatedChan <- graphqluser
 	}()
 	return graphqluser, nil
@@ -58,6 +58,7 @@ func (r *mutationResolver) CreatePost(ctx context.Context, input manualmodels.Cr
 	gqlPost := mapper.ToGraphQLPost(post)
 
 	go func() {
+		log.Println("Publishing post created")
 		r.PostCreatedChan <- gqlPost
 	}()
 
@@ -85,8 +86,19 @@ func (r *mutationResolver) CreateComment(ctx context.Context, input manualmodels
 	gqlComment := mapper.ToGraphQLComment(comment)
 
 	go func() {
+		log.Println("Publishing the commnet created just now ")
 		r.CommentCreatedChan <- gqlComment
 	}()
 
 	return gqlComment, nil
+}
+
+// Register is the resolver for the register field.
+func (r *mutationResolver) Register(ctx context.Context, input manualmodels.RegisterInput) (*manualmodels.AuthPayload, error) {
+	panic(fmt.Errorf("not implemented: Register - register"))
+}
+
+// Login is the resolver for the login field.
+func (r *mutationResolver) Login(ctx context.Context, input manualmodels.LoginInput) (*manualmodels.AuthPayload, error) {
+	panic(fmt.Errorf("not implemented: Login - login"))
 }

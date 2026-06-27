@@ -23,6 +23,5 @@ type Comment struct {
 
 type CreateCommentInput struct {
 	PostID  string `json:"postId"`
-	UserID  string `json:"userId"`
 	Content string `json:"content"`
 }

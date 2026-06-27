@@ -2,6 +2,7 @@ package graph
 
 import (
 	"context"
+	"fmt"
 	"strconv"
 
 	manualmodels "github.com/tarangrastogi/graphql_gqlgen/internal/manualmodel"
@@ -62,4 +63,9 @@ func (r *queryResolver) Post(ctx context.Context, id string) (*manualmodels.Post
 	}
 
 	return mapper.ToGraphQLPost(post), nil
+}
+
+// Me is the resolver for the me field.
+func (r *queryResolver) Me(ctx context.Context) (*manualmodels.User, error) {
+	panic(fmt.Errorf("not implemented: Me - me"))
 }

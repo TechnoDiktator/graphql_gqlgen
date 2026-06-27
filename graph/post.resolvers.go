@@ -107,6 +107,24 @@ func (r *postResolver) Author(
 	*/
 
 }
+/*
+Where you are now
+
+At this point, you've built something that closely matches how DataLoader is used in production GraphQL services. You have:
+
+✅ Layered architecture (Resolvers → Services → Repositories)
+✅ Request-scoped DataLoaders
+✅ Batch loading
+✅ Request-level caching
+✅ Elimination of the N+1 problem for Post.Author
+
+This is a significant milestone. From here, you can apply the same pattern to Comment.Author and Comment.Post, and eventually 
+introduce middleware, authentication, pagination, tracing, and other production concerns.
+
+*/
+
+
+
 
 // Comments is the resolver for the comments field.
 func (r *postResolver) Comments(ctx context.Context, obj *manualmodels.Post) ([]*manualmodels.Comment, error) {
@@ -125,3 +143,38 @@ func (r *postResolver) Comments(ctx context.Context, obj *manualmodels.Post) ([]
 	return mapper.ToGraphQLComments(comments), nil
 
 }
+
+
+/*
+
+{
+  "data": {
+    "createUser": {
+      "id": "24",
+      "name": "Tarang",
+      "age": 28
+    }
+  }
+}
+
+{
+  "data": {
+    "createUser": {
+      "id": "25",
+      "name": "valice",
+      "age": 28
+    }
+  }
+}
+
+{
+  "data": {
+    "createUser": {
+      "id": "26",
+      "name": "mogambo",
+      "age": 56
+    }
+  }
+}
+
+*/

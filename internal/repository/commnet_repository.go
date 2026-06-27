@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	entity "github.com/tarangrastogi/graphql_gqlgen/internal/db_models"
@@ -31,11 +30,21 @@ func NewCommentRepository(db *pgxpool.Pool) CommentRepository {
 	}
 }
 
-func (r *commentRepository) Create(ctx context.Context, comment *entity.Comment) (*entity.Comment, error) {
+func (r *commentRepository) Create(
+	ctx context.Context,
+	comment *entity.Comment,
+) (*entity.Comment, error) {
 
-	query := `INSERT INTO comments(user_id, post_id, content)
-		VALUES ($1, $2, $3)
-		RETURNING id
+	query := `
+	INSERT INTO comments(user_id, post_id, content)
+	VALUES ($1, $2, $3)
+	RETURNING
+		id,
+		user_id,
+		post_id,
+		content,
+		created_at,
+		updated_at
 	`
 
 	err := r.db.QueryRow(
@@ -44,14 +53,20 @@ func (r *commentRepository) Create(ctx context.Context, comment *entity.Comment)
 		comment.UserID,
 		comment.PostID,
 		comment.Content,
-	).Scan(&comment.ID)
+	).Scan(
+		&comment.ID,
+		&comment.UserID,
+		&comment.PostID,
+		&comment.Content,
+		&comment.CreatedAt,
+		&comment.UpdatedAt,
+	)
 
 	if err != nil {
 		return nil, err
 	}
 
 	return comment, nil
-
 }
 
 func (r *commentRepository) GetByID(
@@ -60,9 +75,15 @@ func (r *commentRepository) GetByID(
 ) (*entity.Comment, error) {
 
 	query := `
-		SELECT id, user_id, post_id, content
-		FROM comments
-		WHERE id = $1
+	SELECT
+		id,
+		user_id,
+		post_id,
+		content,
+		created_at,
+		updated_at
+	FROM comments
+	WHERE id = $1
 	`
 
 	comment := &entity.Comment{}
@@ -76,6 +97,8 @@ func (r *commentRepository) GetByID(
 		&comment.UserID,
 		&comment.PostID,
 		&comment.Content,
+		&comment.CreatedAt,
+		&comment.UpdatedAt,
 	)
 
 	if err != nil {
@@ -90,8 +113,14 @@ func (r *commentRepository) GetAll(
 ) ([]*entity.Comment, error) {
 
 	query := `
-		SELECT id, user_id, post_id, content
-		FROM comments
+	SELECT
+		id,
+		user_id,
+		post_id,
+		content,
+		created_at,
+		updated_at
+	FROM comments
 	`
 
 	rows, err := r.db.Query(ctx, query)
@@ -100,7 +129,7 @@ func (r *commentRepository) GetAll(
 	}
 	defer rows.Close()
 
-	var comments []*entity.Comment
+	comments := []*entity.Comment{}
 
 	for rows.Next() {
 
@@ -111,8 +140,9 @@ func (r *commentRepository) GetAll(
 			&comment.UserID,
 			&comment.PostID,
 			&comment.Content,
+			&comment.CreatedAt,
+			&comment.UpdatedAt,
 		)
-
 		if err != nil {
 			return nil, err
 		}
@@ -133,22 +163,24 @@ func (r *commentRepository) GetByUserID(
 ) ([]*entity.Comment, error) {
 
 	query := `
-		SELECT id, user_id, post_id, content
-		FROM comments
-		WHERE user_id = $1
+	SELECT
+		id,
+		user_id,
+		post_id,
+		content,
+		created_at,
+		updated_at
+	FROM comments
+	WHERE user_id = $1
 	`
 
-	rows, err := r.db.Query(
-		ctx,
-		query,
-		userID,
-	)
+	rows, err := r.db.Query(ctx, query, userID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	var comments []*entity.Comment
+	comments := []*entity.Comment{}
 
 	for rows.Next() {
 
@@ -159,8 +191,9 @@ func (r *commentRepository) GetByUserID(
 			&comment.UserID,
 			&comment.PostID,
 			&comment.Content,
+			&comment.CreatedAt,
+			&comment.UpdatedAt,
 		)
-
 		if err != nil {
 			return nil, err
 		}
@@ -181,22 +214,24 @@ func (r *commentRepository) GetByPostID(
 ) ([]*entity.Comment, error) {
 
 	query := `
-		SELECT id, user_id, post_id, content
-		FROM comments
-		WHERE post_id = $1
+	SELECT
+		id,
+		user_id,
+		post_id,
+		content,
+		created_at,
+		updated_at
+	FROM comments
+	WHERE post_id = $1
 	`
 
-	rows, err := r.db.Query(
-		ctx,
-		query,
-		postID,
-	)
+	rows, err := r.db.Query(ctx, query, postID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	var comments []*entity.Comment
+	comments := []*entity.Comment{}
 
 	for rows.Next() {
 
@@ -207,8 +242,9 @@ func (r *commentRepository) GetByPostID(
 			&comment.UserID,
 			&comment.PostID,
 			&comment.Content,
+			&comment.CreatedAt,
+			&comment.UpdatedAt,
 		)
-
 		if err != nil {
 			return nil, err
 		}
@@ -222,7 +258,53 @@ func (r *commentRepository) GetByPostID(
 
 	return comments, nil
 }
+func (r *commentRepository) GetByIDs(
+	ctx context.Context,
+	ids []int64,
+) ([]*entity.Comment, error) {
 
-func (r *commentRepository) GetByIDs(ctx context.Context, ids []int64) ([]*entity.Comment, error) {
-	return nil, fmt.Errorf("not implemented getBYIDs Yet")
+	query := `
+	SELECT
+		id,
+		user_id,
+		post_id,
+		content,
+		created_at,
+		updated_at
+	FROM comments
+	WHERE id = ANY($1)
+	`
+
+	rows, err := r.db.Query(ctx, query, ids)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	comments := make([]*entity.Comment, 0, len(ids))
+
+	for rows.Next() {
+
+		comment := &entity.Comment{}
+
+		err := rows.Scan(
+			&comment.ID,
+			&comment.UserID,
+			&comment.PostID,
+			&comment.Content,
+			&comment.CreatedAt,
+			&comment.UpdatedAt,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		comments = append(comments, comment)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return comments, nil
 }

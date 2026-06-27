@@ -8,15 +8,19 @@ but for any GraphQL type that you explicitly map in gqlgen.yml, it reuses your G
 */
 
 type User struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
-	Age  int32  `json:"age"`
+	ID    string `json:"id"`
+	Name  string `json:"name"`
+	Email string `json:"email"`
+	Age   int32  `json:"age"`
 
 	Posts    []*Post    `json:"posts"`
 	Comments []*Comment `json:"comments"`
 }
 
-type CreateUserInput struct {
-	Name string `json:"name"`
-	Age  int32  `json:"age"`
-}
+
+
+//Now we will do register user
+// type CreateUserInput struct {
+// 	Name string `json:"name"`
+// 	Age  int32  `json:"age"`
+// }

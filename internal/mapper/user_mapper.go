@@ -20,13 +20,13 @@ func ToGraphQLUser(u *entity.User) *manualmodels.User {
 }
 
 
-func ToEntityUser(input manualmodels.CreateUserInput) *entity.User {
+func ToEntityUser(input manualmodels.RegisterInput) *entity.User {
 	return &entity.User{
-		Name: input.Name,
-		Age:  int(input.Age),
+		Name:  input.Name,
+		Email: input.Email,
+		Age:   input.Age,
 	}
 }
-
 func ToGraphQLUsers(users []*entity.User) []*manualmodels.User {
 
 	result := make([]*manualmodels.User, 0, len(users))
