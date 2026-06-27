@@ -12,9 +12,9 @@ import (
 // It serves as dependency injection for your app, add any dependencies you require
 // here.
 type Resolver struct {
-	UserService    *service.UserService
-	PostService    *service.PostService
-	CommentService *service.CommentService
+	UserService    service.UserService
+	PostService    service.PostService
+	CommentService service.CommentService
 
 	UserCreatedChan    chan *manualmodels.User
 	PostCreatedChan    chan *manualmodels.Post

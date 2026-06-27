@@ -12,14 +12,14 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler/lru"
 	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/99designs/gqlgen/graphql/playground"
+	"github.com/joho/godotenv"
 	"github.com/tarangrastogi/graphql_gqlgen/graph"
 	"github.com/tarangrastogi/graphql_gqlgen/internal/db"
+	loader "github.com/tarangrastogi/graphql_gqlgen/internal/dataloader"
 	manualmodels "github.com/tarangrastogi/graphql_gqlgen/internal/manualmodel"
 	"github.com/tarangrastogi/graphql_gqlgen/internal/repository"
 	"github.com/tarangrastogi/graphql_gqlgen/internal/service"
 	"github.com/vektah/gqlparser/v2/ast"
-
-	"github.com/joho/godotenv"
 )
 
 const defaultPort = "8080"
@@ -77,7 +77,26 @@ func main() {
 	})
 
 	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
-	http.Handle("/query", srv)
+	//http.Handle("/query", srv)
+
+	http.Handle("/query", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		//this is a batch loading middleware that optimizes batch requests and prevents the N+1 problem 
+		loaders := loader.NewLoaders(
+			userService,
+			postService,
+			commentService,
+		)
+
+		ctx := loader.WithLoaders(
+			r.Context(),
+			loaders,
+		)
+
+		srv.ServeHTTP(
+			w,
+			r.WithContext(ctx),
+		)
+	}))
 
 	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
 	log.Fatal(http.ListenAndServe(":"+port, nil))

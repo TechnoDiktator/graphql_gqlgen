@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	entity "github.com/tarangrastogi/graphql_gqlgen/internal/db_models"
@@ -17,6 +18,7 @@ type CommentRepository interface {
 	GetByUserID(ctx context.Context, userID int64) ([]*entity.Comment, error)
 
 	GetByPostID(ctx context.Context, postID int64) ([]*entity.Comment, error)
+	GetByIDs(ctx context.Context, ids []int64) ([]*entity.Comment, error)
 }
 
 type commentRepository struct {
@@ -219,4 +221,8 @@ func (r *commentRepository) GetByPostID(
 	}
 
 	return comments, nil
+}
+
+func (r *commentRepository) GetByIDs(ctx context.Context, ids []int64) ([]*entity.Comment, error) {
+	return nil, fmt.Errorf("not implemented getBYIDs Yet")
 }

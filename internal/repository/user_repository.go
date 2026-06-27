@@ -14,6 +14,8 @@ type UserRepository interface {
 
 	GetAll(ctx context.Context) ([]*entity.User, error)
 
+	GetByIDs(ctx context.Context, ids []int64) ([]*entity.User, error)
+
 	// Update(ctx context.Context, user *entity.User) error
 
 	// Delete(ctx context.Context, id int64) error
@@ -121,4 +123,43 @@ func (r *postgresUserRepository) GetAll(
 	}
 
 	return users, nil
+}
+
+func (r *postgresUserRepository) GetByIDs(ctx context.Context, ids []int64) ([]*entity.User, error) {
+
+	query := `
+		SELECT id, name, age
+		FROM users
+		WHERE id = ANY($1)
+	`
+
+	rows, err := r.db.Query(ctx, query, ids)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	users := make([]*entity.User, 0, len(ids))
+
+	for rows.Next() {
+		user := &entity.User{}
+
+		err := rows.Scan(
+			&user.ID,
+			&user.Name,
+			&user.Age,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		users = append(users, user)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return users, nil
+
 }

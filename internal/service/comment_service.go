@@ -7,7 +7,17 @@ import (
 	"github.com/tarangrastogi/graphql_gqlgen/internal/repository"
 )
 
-type CommentService struct {
+type CommentService interface {
+	Create(ctx context.Context, comment *entity.Comment) (*entity.Comment, error)
+	GetByID(ctx context.Context, id int64) (*entity.Comment, error)
+	GetAll(ctx context.Context) ([]*entity.Comment, error)
+	GetByUserID(ctx context.Context, userID int64) ([]*entity.Comment, error)
+	GetByPostID(ctx context.Context, postID int64) ([]*entity.Comment, error)
+
+	GetByIDs(ctx context.Context, ids []int64) ([]*entity.Comment, error)
+}
+
+type commentService struct {
 	commentRepo repository.CommentRepository
 	userRepo    repository.UserRepository
 	postRepo    repository.PostRepository
@@ -17,8 +27,8 @@ func NewCommentService(
 	commentRepo repository.CommentRepository,
 	userRepo repository.UserRepository,
 	postRepo repository.PostRepository,
-) *CommentService {
-	return &CommentService{
+) CommentService {
+	return &commentService{
 		commentRepo: commentRepo,
 		userRepo:    userRepo,
 		postRepo:    postRepo,
@@ -26,7 +36,7 @@ func NewCommentService(
 }
 
 // Create creates a new comment.
-func (s *CommentService) Create(
+func (s *commentService) Create(
 	ctx context.Context,
 	comment *entity.Comment,
 ) (*entity.Comment, error) {
@@ -40,7 +50,7 @@ func (s *CommentService) Create(
 }
 
 // GetByID fetches a comment by its ID.
-func (s *CommentService) GetByID(
+func (s *commentService) GetByID(
 	ctx context.Context,
 	id int64,
 ) (*entity.Comment, error) {
@@ -49,7 +59,7 @@ func (s *CommentService) GetByID(
 }
 
 // GetAll fetches all comments.
-func (s *CommentService) GetAll(
+func (s *commentService) GetAll(
 	ctx context.Context,
 ) ([]*entity.Comment, error) {
 
@@ -57,7 +67,7 @@ func (s *CommentService) GetAll(
 }
 
 // GetByUserID fetches all comments made by a user.
-func (s *CommentService) GetByUserID(
+func (s *commentService) GetByUserID(
 	ctx context.Context,
 	userID int64,
 ) ([]*entity.Comment, error) {
@@ -66,12 +76,19 @@ func (s *CommentService) GetByUserID(
 }
 
 // GetByPostID fetches all comments on a post.
-func (s *CommentService) GetByPostID(
+func (s *commentService) GetByPostID(
 	ctx context.Context,
 	postID int64,
 ) ([]*entity.Comment, error) {
 
 	return s.commentRepo.GetByPostID(ctx, postID)
+}
+func (s *commentService) GetByIDs(
+	ctx context.Context,
+	ids []int64,
+) ([]*entity.Comment, error) {
+
+	return s.commentRepo.GetByIDs(ctx, ids)
 }
 
 // Update updates an existing comment.

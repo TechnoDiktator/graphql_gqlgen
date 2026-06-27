@@ -2,6 +2,7 @@ package repository
 
 import (
 	context "context"
+	"fmt"
 
 	entity "github.com/tarangrastogi/graphql_gqlgen/internal/db_models"
 
@@ -13,6 +14,7 @@ type PostRepository interface {
 	GetByID(ctx context.Context, id int64) (*entity.Post, error)
 	GetAll(ctx context.Context) ([]*entity.Post, error)
 	GetByUserID(ctx context.Context, userID int64) ([]*entity.Post, error)
+	GetByIDs(ctx context.Context, ids []int64) ([]*entity.Post, error)
 }
 
 // 	Update(ctx context.Context, post *entity.Post) error
@@ -153,4 +155,8 @@ func (r *postRepository) GetByUserID(
 	}
 
 	return posts, nil
+}
+
+func (r *postRepository) GetByIDs(ctx context.Context, ids []int64) ([]*entity.Post, error) {
+	return nil, fmt.Errorf("not implemented getBYIDs Yet")
 }
