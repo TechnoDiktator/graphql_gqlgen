@@ -1,0 +1,452 @@
+The roadmap I'd recommend for your project
+
+Given your goal of preparing for backend interviews, I'd tackle the remaining work in this order:
+
+Refactor resolver files (one file per GraphQL type).
+Implement a proper subscription manager (broadcast to multiple subscribers).
+Add DataLoaders to solve the N+1 problem.
+Introduce authentication and authorization with JWT and context.
+Add transactions where operations span multiple repositories.
+Implement structured error handling with GraphQL error extensions.
+Add middleware (logging, auth, recovery, metrics).
+Write comprehensive tests for repositories, services, and resolvers.
+Dockerize the application with PostgreSQL and add docker-compose.
+Add observability (structured logging, tracing, metrics).
+
+
+
+
+Phase 1 (Current) — CRUD Architecture ✅
+
+You have already done most of this.
+
+✅ gqlgen
+✅ PostgreSQL
+✅ pgxpool
+✅ Repository layer
+✅ Service layer
+✅ Mapper layer
+✅ Custom GraphQL models
+✅ Nested resolvers
+✅ Basic subscriptions
+
+This is your MVP.
+
+Phase 2 — Production Folder Structure ⭐⭐⭐
+
+Instead of
+
+graph/
+    schema.resolvers.go
+
+move to
+
+graph/
+    resolver.go
+
+    query.resolvers.go
+    mutation.resolvers.go
+    subscription.resolvers.go
+
+    user.resolvers.go
+    post.resolvers.go
+    comment.resolvers.go
+
+One file per GraphQL type.
+
+This is what you'll usually see.
+
+Phase 3 — DataLoaders (N+1 Solution) ⭐⭐⭐⭐⭐
+
+Probably the biggest GraphQL interview topic.
+
+Implement loaders for
+
+UserLoader
+PostLoader
+CommentLoader
+
+instead of
+
+CommentResolver.Post()
+
+↓
+
+PostService.GetByID()
+
+↓
+
+100 SQL queries
+
+you'll have
+
+CommentResolver.Post()
+
+↓
+
+Loader.Load()
+
+↓
+
+Collect IDs
+
+↓
+
+SELECT * FROM posts WHERE id IN (...)
+
+This is probably the most important production GraphQL optimization.
+
+Phase 4 — Real Subscription Manager ⭐⭐⭐⭐⭐
+
+Right now you have
+
+chan *User
+
+Production systems don't.
+
+Instead
+
+type SubscriptionManager struct {
+
+    userSubscribers map[string]chan *User
+
+    postSubscribers map[string]chan *Post
+
+    commentSubscribers map[string]chan *Comment
+
+    mutex sync.RWMutex
+}
+
+Now
+
+CreateUser()
+
+broadcasts to every subscriber.
+
+Phase 5 — Dependency Injection ⭐⭐⭐⭐
+
+Instead of manually wiring
+
+Resolver
+
+create
+
+App
+
+↓
+
+Database
+
+↓
+
+Repositories
+
+↓
+
+Services
+
+↓
+
+Resolvers
+
+Something like
+
+internal/
+
+    app/
+
+        app.go
+
+where
+
+app.New()
+
+creates the whole application.
+
+Phase 6 — Configuration ⭐⭐⭐⭐
+
+Replace
+
+os.Getenv(...)
+
+with
+
+internal/config
+
+using
+
+envconfig
+
+or
+
+viper
+
+Production never scatters
+
+os.Getenv()
+
+through the code.
+
+Phase 7 — Middleware ⭐⭐⭐⭐⭐
+
+GraphQL middleware is huge.
+
+Implement
+
+Request Logging
+
+Authentication
+
+Authorization
+
+Tracing
+
+Metrics
+
+Panic Recovery
+
+Rate Limiting
+Phase 8 — Authentication ⭐⭐⭐⭐⭐
+
+Add JWT authentication.
+
+GraphQL Context should contain
+
+CurrentUser
+
+Resolvers become
+
+ctx
+
+↓
+
+CurrentUser
+
+↓
+
+Business Logic
+
+instead of passing user IDs around.
+
+Phase 9 — Authorization ⭐⭐⭐⭐⭐
+
+Example
+
+DeletePost
+
+should check
+
+CurrentUser.ID == Post.OwnerID
+
+before deleting.
+
+Phase 10 — Cursor Pagination ⭐⭐⭐⭐⭐
+
+Replace
+
+posts: [Post!]!
+
+with
+
+posts(
+    first: Int
+    after: String
+)
+
+using Relay Connections.
+
+Every large GraphQL API does this.
+
+Phase 11 — Filtering & Sorting ⭐⭐⭐⭐
+
+Instead of
+
+posts
+
+implement
+
+posts(
+    filter
+    sort
+    pagination
+)
+Phase 12 — Transactions ⭐⭐⭐⭐
+
+Example
+
+CreatePost
+
+and
+
+CreateComment
+
+inside
+
+db.Begin()
+
+↓
+
+Commit()
+
+↓
+
+Rollback()
+Phase 13 — Validation ⭐⭐⭐⭐
+
+Use
+
+go-playground/validator
+
+instead of validating inside resolvers.
+
+Phase 14 — Error Handling ⭐⭐⭐⭐⭐
+
+Instead of
+
+return nil, err
+
+return
+
+GraphQL Error
+
+↓
+
+extensions
+
+↓
+
+code
+
+↓
+
+message
+
+Example
+
+{
+    "message":"Post not found",
+
+    "extensions":{
+
+        "code":"POST_NOT_FOUND"
+    }
+}
+Phase 15 — Logging ⭐⭐⭐⭐
+
+Replace
+
+log.Println()
+
+with
+
+zap
+
+or
+
+slog
+Phase 16 — Observability ⭐⭐⭐⭐⭐
+
+Add
+
+OpenTelemetry
+
+↓
+
+Prometheus
+
+↓
+
+Grafana
+
+GraphQL tracing is a common production requirement.
+
+Phase 17 — Caching ⭐⭐⭐⭐⭐
+
+Cache
+
+User
+
+↓
+
+Redis
+
+before going to Postgres.
+
+Phase 18 — Testing ⭐⭐⭐⭐⭐
+
+Write
+
+Repository Tests
+
+↓
+
+Service Tests
+
+↓
+
+Resolver Tests
+
+↓
+
+Integration Tests
+
+using Dockerized PostgreSQL or test containers.
+
+Phase 19 — Docker ⭐⭐⭐⭐
+
+Create
+
+docker-compose.yml
+
+↓
+
+postgres
+
+↓
+
+graphql server
+Phase 20 — CI/CD ⭐⭐⭐⭐
+
+GitHub Actions
+
+Go Test
+
+↓
+
+Lint
+
+↓
+
+Build
+
+↓
+
+Docker Image
+Phase 21 — Federation (Advanced)
+
+Implement
+
+Apollo Federation
+
+using gqlgen.
+
+Phase 22 — Complexity Limiting ⭐⭐⭐⭐⭐
+
+Prevent queries like
+
+users {
+
+    posts {
+
+        comments {
+
+            author {
+
+                posts {
+
+                    comments {
+
+...
+
+by configuring gqlgen's complexity analyzer.
+

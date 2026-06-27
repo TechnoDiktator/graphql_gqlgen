@@ -1,0 +1,81 @@
+I think that's the right approach. Don't try to replace all the mock resolvers at once. Start with the root Query and Mutation resolvers, because they are the simplest. The nested resolvers (User.posts, Post.author, Comment.post, etc.) depend on relationships and require a bit more thought.
+
+I'd implement them in this order:
+
+Phase 1: Root Queries ✅ (Easy)
+Query.Users
+Query.User
+
+Query.Posts
+Query.Post
+
+These are just:
+
+Resolver
+    ↓
+Service
+    ↓
+Repository
+    ↓
+Mapper
+
+No nested lookups.
+
+Phase 2: Root Mutations ✅ (Easy)
+Mutation.CreateUser
+Mutation.CreatePost
+Mutation.CreateComment
+
+Flow:
+
+GraphQL Input
+        ↓
+Mapper
+        ↓
+Entity
+        ↓
+Service
+        ↓
+Repository
+        ↓
+Database
+        ↓
+Entity
+        ↓
+Mapper
+        ↓
+GraphQL Model
+
+Again, straightforward.
+
+Phase 3: User Nested Resolvers ⭐
+User.posts
+User.comments
+
+Both are simple foreign-key lookups.
+
+user.ID
+     ↓
+PostService.GetByUserID()
+
+or
+
+CommentService.GetByUserID()
+Phase 4: Post Nested Resolvers ⭐⭐
+Post.author
+Post.comments
+
+Again, direct lookups.
+
+post.UserID
+        ↓
+UserService.GetByID()
+
+post.ID
+      ↓
+CommentService.GetByPostID()
+Phase 5: Comment Nested Resolvers ⭐⭐⭐
+Comment.author
+Comment.post
+
+These are the ones we discussed—they require access to UserID and PostID on the GraphQL model (or another strategy to carry those foreign keys).

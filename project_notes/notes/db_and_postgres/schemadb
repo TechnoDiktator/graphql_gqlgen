@@ -1,0 +1,29 @@
+                 USERS
+           +----------------+
+           | id (PK)        |
+           | name           |
+           +----------------+
+             /           \
+            /             \
+           /               \
+          v                 v
+
+      POSTS              TODOS
+ +----------------+   +----------------+
+ | id (PK)        |   | id (PK)        |
+ | title          |   | text           |
+ | content        |   | done           |
+ | author_id (FK) |   | user_id (FK)   |
+ +----------------+   +----------------+
+
+          |
+          |
+          v
+
+      COMMENTS
+ +----------------+
+ | id (PK)        |
+ | text           |
+ | author_id (FK) |
+ | post_id (FK)   |
+ +----------------+

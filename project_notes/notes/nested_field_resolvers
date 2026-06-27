@@ -1,0 +1,235 @@
+Yes, I'd say Step 2 is complete. More importantly, you've learned one of the core ideas behind GraphQL execution.
+
+Let's summarize what you've accomplished and what you've actually learned.
+
+✅ Step 2: Nested Field Resolvers
+What we built
+
+Schema:
+
+type User {
+    id: ID!
+    name: String!
+    age: Int!
+    posts: [Post!]!
+}
+
+type Post {
+    id: ID!
+    title: String!
+    content: String!
+}
+
+We forced gqlgen to generate
+
+func (r *userResolver) Posts(ctx context.Context, obj *model.User) ([]*model.Post, error)
+
+using
+
+models:
+  User:
+    fields:
+      posts:
+        resolver: true
+What actually happens internally
+
+When the client executes
+
+query {
+    users {
+        id
+        name
+        posts {
+            content
+        }
+    }
+}
+
+GraphQL does not fetch everything at once.
+
+Instead, execution happens like a tree traversal.
+
+                 Query
+                   │
+                   ▼
+             users()
+                   │
+                   ▼
+        ┌───────────────┐
+        │               │
+      User1          User2
+        │               │
+        ▼               ▼
+ Posts(User1)     Posts(User2)
+        │               │
+        ▼               ▼
+   Post1 Post2     Post3 Post4
+Actual execution
+Step 1
+
+GraphQL calls
+
+Users()
+
+which returns
+
+[]User{
+    John,
+    Jane,
+}
+Step 2
+
+GraphQL now starts resolving every requested field.
+
+For User 1
+
+Posts(ctx, John)
+
+Notice
+
+obj == John
+
+For User 2
+
+Posts(ctx, Jane)
+
+Now
+
+obj == Jane
+
+Inside your resolver
+
+switch obj.ID {
+
+case "1":
+    ...
+
+case "2":
+    ...
+}
+
+GraphQL already knows which user is being processed.
+
+That's why it passes
+
+obj *model.User
+
+instead of
+
+userID string
+The important realization
+
+GraphQL is traversing a graph.
+
+It is literally saying
+
+I already have this User.
+
+Now tell me about its Posts.
+
+It is not
+
+Go search for some random posts.
+
+This is why the resolver signature is
+
+Posts(ctx, obj *model.User)
+
+instead of
+
+Posts(userID string)
+Why field resolvers exist
+
+Imagine PostgreSQL.
+
+Users table
+
+id
+name
+age
+
+Posts table
+
+id
+title
+content
+user_id
+
+Your Users resolver executes
+
+SELECT *
+FROM users;
+
+It returns
+
+John
+Jane
+
+There are no posts yet.
+
+Later GraphQL asks
+
+Resolve John's posts.
+
+Now your resolver runs
+
+SELECT *
+FROM posts
+WHERE user_id = 1;
+
+Then
+
+Resolve Jane's posts.
+SELECT *
+FROM posts
+WHERE user_id = 2;
+
+That is exactly how production GraphQL servers work.
+
+Difference from REST
+
+REST usually looks like
+
+GET /users
+
+↓
+
+GET /users/1/posts
+
+↓
+
+GET /users/2/posts
+
+The client decides which endpoints to call.
+
+GraphQL instead receives
+
+{
+    users {
+        posts {
+            title
+        }
+    }
+}
+
+and the GraphQL server decides which resolvers to invoke to satisfy that single query.
+
+What you have learned so far
+
+✅ GraphQL schema
+
+✅ Object types
+
+✅ Query root
+
+✅ Aliases
+
+✅ Automatic field binding
+
+✅ Field resolvers
+
+✅ Parent (obj) parameter
+
+✅ Graph traversal
+
+✅ Resolver execution order

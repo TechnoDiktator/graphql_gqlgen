@@ -1,0 +1,296 @@
+# Welcome to GraphiQL
+#
+# GraphiQL is an in-browser tool for writing, validating, and
+# testing GraphQL queries.
+#
+# Type queries into this side of the screen, and you will see intelligent
+# typeaheads aware of the current GraphQL type schema and live syntax and
+# validation errors highlighted within the text.
+#
+# GraphQL queries typically start with a "{" character. Lines that start
+# with a # are ignored.
+#
+# An example GraphQL query might look like:
+#
+#     {
+#       field(arg: "value") {
+#         subField
+#       }
+#     }
+#
+# Keyboard shortcuts:
+#
+#   Prettify query:  Shift-Ctrl-P (or press the prettify button)
+#
+#  Merge fragments:  Shift-Ctrl-M (or press the merge button)
+#
+#        Run Query:  Ctrl-Enter (or press the play button)
+#
+#    Auto Complete:  Ctrl-Space (or just start typing)
+#
+
+query{
+  users{
+    id
+    name
+  }
+  firstUser: user(id : 1){
+  	  age
+
+  }
+  secondUser: user(id : 2){
+  	  age
+
+  }
+}
+
+GraphQL Field Aliases and Query Execution
+Schema
+type User {
+    id: ID!
+    name: String!
+    age: Int!
+}
+
+type Query {
+    users: [User!]!
+    user(id: ID!): User
+}
+
+This schema exposes two top-level queries:
+
+users → Returns a list of users.
+user(id) → Returns a single user by its ID.
+Query
+query {
+  users {
+    id
+    name
+  }
+
+  firstUser: user(id: "1") {
+    age
+  }
+
+  secondUser: user(id: "2") {
+    age
+  }
+}
+Step 1: GraphQL parses the query
+
+The GraphQL parser converts the query into an Abstract Syntax Tree (AST).
+
+The root fields are:
+
+Query
+│
+├── users
+├── firstUser -> user(id: "1")
+└── secondUser -> user(id: "2")
+
+Notice that firstUser and secondUser are aliases, not actual schema fields.
+
+The actual schema field is still:
+
+user(id: ID!)
+Step 2: GraphQL validates the query
+
+The validator checks:
+
+Does users exist on Query? ✅
+Does user exist on Query? ✅
+Are the arguments correct? ✅
+Do id, name, and age exist on User? ✅
+
+Since everything matches the schema, execution begins.
+
+Why aliases are required
+
+Suppose we wrote:
+
+query {
+  user(id: "1") {
+    age
+  }
+
+  user(id: "2") {
+    age
+  }
+}
+
+This is invalid.
+
+Why?
+
+Both fields have the same response name:
+
+user
+user
+
+but they have different arguments.
+
+If GraphQL allowed this, the response would have to look like:
+
+{
+    "user": ?
+}
+
+Should user contain the first user or the second one?
+
+There is no unambiguous answer.
+
+Therefore GraphQL throws:
+
+Fields "user" conflict because they have differing arguments.
+Aliases solve this problem
+
+Aliases rename the field only in the response.
+
+firstUser: user(id: "1")
+secondUser: user(id: "2")
+
+Internally GraphQL still calls the user resolver.
+
+The aliases simply tell GraphQL to place the results under different keys.
+
+Response:
+
+{
+    "firstUser": { ... },
+    "secondUser": { ... }
+}
+Step 3: Resolver execution
+
+GraphQL now executes each top-level field independently.
+
+Conceptually:
+
+users := Query.Users()
+
+firstUser := Query.User("1")
+
+secondUser := Query.User("2")
+
+The order is not guaranteed by the GraphQL specification. Since these fields are independent, many GraphQL implementations may execute them concurrently.
+
+Step 4: Resolver returns Go objects
+
+Suppose the resolver returns
+
+&model.User{
+    ID: "1",
+    Name: "John Doe",
+    Age: 30,
+}
+
+This object contains all three fields.
+
+User
+├── ID
+├── Name
+└── Age
+Step 5: GraphQL selects only requested fields
+
+For
+
+user(id: "1") {
+    age
+}
+
+GraphQL ignores
+
+id
+name
+
+and serializes only
+
+age
+
+Result:
+
+{
+    "age": 30
+}
+
+Even though the resolver returned the complete object.
+
+Why GraphQL behaves this way
+
+The client specifies exactly what data it wants.
+
+The server only serializes those requested fields.
+
+Benefits:
+
+No over-fetching
+No under-fetching
+Different clients can request different subsets of the same object
+
+Example:
+
+Mobile app:
+
+user(id: "1") {
+    name
+}
+
+Web app:
+
+user(id: "1") {
+    id
+    name
+    age
+}
+
+Both use the same resolver.
+
+Final response construction
+
+After all resolvers finish, GraphQL combines the results into a single JSON response.
+
+Query
+│
+├── users
+│     ↓
+│     [
+│       {id, name},
+│       {id, name}
+│     ]
+│
+├── firstUser
+│     ↓
+│     {age}
+│
+└── secondUser
+      ↓
+      {age}
+
+Final response:
+
+{
+  "data": {
+    "users": [
+      {
+        "id": "1",
+        "name": "John Doe"
+      },
+      {
+        "id": "2",
+        "name": "Jane Smith"
+      }
+    ],
+    "firstUser": {
+      "age": 30
+    },
+    "secondUser": {
+      "age": 25
+    }
+  }
+}
+Key Takeaways
+Every GraphQL query starts execution from the root type (Query, Mutation, or Subscription).
+Each top-level field invokes its corresponding resolver.
+The same field cannot appear multiple times with different arguments unless aliases are used.
+Aliases rename fields only in the response; they do not change the schema or which resolver is called.
+Resolvers may return complete objects, but GraphQL serializes only the fields requested by the client.
+After all requested fields are resolved, GraphQL assembles them into a single JSON response that mirrors the structure of the query.

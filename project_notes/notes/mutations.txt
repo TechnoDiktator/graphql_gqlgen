@@ -1,0 +1,169 @@
+GraphQL Mutations
+What is a Mutation?
+
+A Mutation is a GraphQL operation used to create, update, or delete data. It is the equivalent of POST/PUT/PATCH/DELETE in REST.
+
+Example schema:
+
+type Mutation {
+    createUser(input: CreateUserInput!): User!
+}
+Why use input objects?
+
+Instead of
+
+createUser(name: String!, age: Int!): User!
+
+prefer
+
+createUser(input: CreateUserInput!): User!
+input CreateUserInput {
+    name: String!
+    age: Int!
+}
+Advantages
+Cleaner schema
+Easier to extend later
+Groups related fields together
+Standard practice in production GraphQL APIs
+gqlgen Generated Resolver
+func (r *mutationResolver) CreateUser(
+    ctx context.Context,
+    input model.CreateUserInput,
+) (*model.User, error)
+
+Notice:
+
+CreateUserInput becomes a Go struct automatically.
+GraphQL validates the input before calling the resolver.
+Mutation Execution Flow
+
+Client
+
+mutation {
+    createUser(input: {
+        name: "Tarang"
+        age: 25
+    }) {
+        id
+        name
+        posts {
+            title
+        }
+    }
+}
+
+Execution:
+
+Mutation.createUser()
+        │
+        ▼
+Returns User
+        │
+        ▼
+GraphQL traverses User
+        │
+        ▼
+User.posts()
+        │
+        ▼
+Returns Posts
+
+A mutation resolver only returns the root object.
+
+GraphQL resolves the remaining requested fields using the appropriate field resolvers.
+
+Parent Object Propagation
+
+Suppose CreateUser() returns
+
+&model.User{
+    ID: "3",
+    Name: "Tarang",
+    Age: 25,
+}
+
+GraphQL automatically calls
+
+Posts(ctx, obj)
+
+where
+
+obj.ID == "3"
+
+You do not pass the ID manually.
+
+The object returned by one resolver becomes the parent object for resolving its child fields.
+
+Important Distinction
+
+These are different resolvers:
+
+type Query {
+    posts: [Post!]!
+}
+
+type User {
+    posts: [Post!]!
+}
+
+Generated as
+
+queryResolver.Posts(...)
+
+and
+
+userResolver.Posts(...)
+
+Although both are named posts, GraphQL chooses the resolver based on the parent type.
+
+Parent Type	Resolver Called
+Query	queryResolver.Posts()
+User	userResolver.Posts()
+
+Resolvers are identified by (Parent Type, Field Name).
+
+Return Type Matters
+
+Schema
+
+createUser(...): User!
+
+requires the resolver to return a non-null User.
+
+Returning
+
+return nil, nil
+
+produces
+
+cannot return null for non-nullable field Mutation.createUser
+
+because GraphQL has no parent object to continue resolving.
+
+Why Return the Created Object?
+
+Returning the created object allows the client to immediately request additional fields.
+
+Example
+
+mutation {
+    createUser(...) {
+        id
+        name
+        posts {
+            title
+        }
+    }
+}
+
+GraphQL automatically resolves posts after createUser() returns the User.
+
+Caveats
+Mutations should perform state-changing operations only.
+GraphQL resolves child fields after the mutation returns.
+A mutation resolver should not manually populate every requested nested field; return the root object and let GraphQL invoke field resolvers.
+If the mutation returns a User, GraphQL can continue resolving User fields (posts, followers, etc.).
+If the mutation returns Boolean, ID, or another scalar, there are no nested fields to resolve.
+The resolver chosen for a field depends on the parent type, not on whether the object originated from a Query, Mutation, or Subscription.
+In production, the mutation typically inserts/updates data in the database and returns the persisted entity (often with the database-generated ID). Field resolvers then use that returned object to fetch related data if requested.
