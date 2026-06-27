@@ -4,23 +4,19 @@ import (
 	"strconv"
 
 	entity "github.com/tarangrastogi/graphql_gqlgen/internal/db_models"
-	"github.com/tarangrastogi/graphql_gqlgen/internal/manualmodel"
+	manualmodels "github.com/tarangrastogi/graphql_gqlgen/internal/manualmodel"
 )
 
 func ToGraphQLPost(post *entity.Post) *manualmodels.Post {
-
-	if post == nil {
-		return nil
-	}
-
 	return &manualmodels.Post{
 		ID:      strconv.FormatInt(post.ID, 10),
 		Title:   post.Title,
 		Content: post.Content,
+
+		UserID: strconv.FormatInt(post.UserID, 10), // <-- REQUIRED
 	}
 }
-
-func ToEntityPost(input manualmodels.CreatePostInput) (*entity.Post ,  error) {
+func ToEntityPost(input manualmodels.CreatePostInput) (*entity.Post, error) {
 
 	userID, err := strconv.ParseInt(input.UserID, 10, 64)
 	if err != nil {
@@ -31,7 +27,7 @@ func ToEntityPost(input manualmodels.CreatePostInput) (*entity.Post ,  error) {
 		UserID:  userID,
 		Title:   input.Title,
 		Content: input.Content,
-	} , nil
+	}, nil
 }
 
 func ToGraphQLPosts(posts []*entity.Post) []*manualmodels.Post {

@@ -8,6 +8,7 @@ package graph
 import (
 	"context"
 	"fmt"
+	"log"
 	"strconv"
 
 	manualmodels "github.com/tarangrastogi/graphql_gqlgen/internal/manualmodel"
@@ -17,7 +18,11 @@ import (
 // Post is the resolver for the post field.
 func (r *commentResolver) Post(ctx context.Context, obj *manualmodels.Comment) (*manualmodels.Post, error) {
 	//panic(fmt.Errorf("not implemented: Post - post"))
-
+	log.Printf(
+		"[Resolver] Comment.Post | commentID=%s postID=%s",
+		obj.ID,
+		obj.PostID,
+	)
 	postID, err := strconv.ParseInt(obj.PostID, 10, 64)
 	if err != nil {
 		return nil, err
@@ -34,7 +39,11 @@ func (r *commentResolver) Post(ctx context.Context, obj *manualmodels.Comment) (
 // Author is the resolver for the author field.
 func (r *commentResolver) Author(ctx context.Context, obj *manualmodels.Comment) (*manualmodels.User, error) {
 	//panic(fmt.Errorf("not implemented: Author - author"))
-
+	log.Printf(
+		"[Resolver] Comment.Author | commentID=%s userID=%s",
+		obj.ID,
+		obj.UserID,
+	)
 	userID, err := strconv.ParseInt(obj.UserID, 10, 64)
 	if err != nil {
 		return nil, err
@@ -52,6 +61,13 @@ func (r *commentResolver) Author(ctx context.Context, obj *manualmodels.Comment)
 // CreateUser is the resolver for the createUser field.
 func (r *mutationResolver) CreateUser(ctx context.Context, input manualmodels.CreateUserInput) (*manualmodels.User, error) {
 	//panic(fmt.Errorf("not implemented: CreateUser - createUser"))
+
+	log.Printf(
+		"[Resolver] Mutation.CreateUser | name=%s age=%d",
+		input.Name,
+		input.Age,
+	)
+
 	entityUser := mapper.ToEntityUser(input)
 
 	user, err := r.UserService.Create(ctx, entityUser)
@@ -59,30 +75,52 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input manualmodels.Cr
 		return nil, err
 	}
 
-	return mapper.ToGraphQLUser(user), nil
+	graphqluser := mapper.ToGraphQLUser(user)
+
+	go func() {
+		log.Panicln("Publishing user")
+		r.UserCreatedChan <- graphqluser
+	}()
+	return graphqluser, nil
 }
 
 // CreatePost is the resolver for the createPost field.
 func (r *mutationResolver) CreatePost(ctx context.Context, input manualmodels.CreatePostInput) (*manualmodels.Post, error) {
 	//panic(fmt.Errorf("not implemented: CreatePost - createPost"))
+	log.Printf(
+		"[Resolver] Mutation.CreatePost | userID=%s title=%q",
+		input.UserID,
+		input.Title,
+	)
 
+	fmt.Printf("\n gql model object %s", input)
 	entityPost, err := mapper.ToEntityPost(input)
 	if err != nil {
 		return nil, err
 	}
-
+	fmt.Printf("\n db entity created %s", entityPost)
 	post, err := r.PostService.Create(ctx, entityPost)
 	if err != nil {
 		return nil, err
 	}
+	fmt.Printf("\n db object created %s", input)
+	gqlPost := mapper.ToGraphQLPost(post)
 
-	return mapper.ToGraphQLPost(post), nil
+	go func() {
+		r.PostCreatedChan <- gqlPost
+	}()
+
+	return gqlPost, nil
 }
 
 // CreateComment is the resolver for the createComment field.
 func (r *mutationResolver) CreateComment(ctx context.Context, input manualmodels.CreateCommentInput) (*manualmodels.Comment, error) {
 	//panic(fmt.Errorf("not implemented: CreateComment - createComment"))
-
+	log.Printf(
+		"[Resolver] Mutation.CreateComment | postID=%s userID=%s",
+		input.PostID,
+		input.UserID,
+	)
 	entityComment, err := mapper.ToEntityComment(input)
 	if err != nil {
 		return nil, err
@@ -93,13 +131,23 @@ func (r *mutationResolver) CreateComment(ctx context.Context, input manualmodels
 		return nil, err
 	}
 
-	return mapper.ToGraphQLComment(comment), nil
+	gqlComment := mapper.ToGraphQLComment(comment)
+
+	go func() {
+		r.CommentCreatedChan <- gqlComment
+	}()
+
+	return gqlComment, nil
 }
 
 // Author is the resolver for the author field.
 func (r *postResolver) Author(ctx context.Context, obj *manualmodels.Post) (*manualmodels.User, error) {
 	//panic(fmt.Errorf("not implemented: Author - author"))
-
+	log.Printf(
+		"[Resolver] Post.Author | postID=%s userID=%s",
+		obj.ID,
+		obj.UserID,
+	)
 	userID, err := strconv.ParseInt(obj.UserID, 10, 64)
 	if err != nil {
 		return nil, err
@@ -116,7 +164,7 @@ func (r *postResolver) Author(ctx context.Context, obj *manualmodels.Post) (*man
 // Comments is the resolver for the comments field.
 func (r *postResolver) Comments(ctx context.Context, obj *manualmodels.Post) ([]*manualmodels.Comment, error) {
 	//panic(fmt.Errorf("not implemented: Comments - comments"))
-
+	log.Printf("[Resolver] Post.Comments | postID=%s", obj.ID)
 	postID, err := strconv.ParseInt(obj.ID, 10, 64)
 	if err != nil {
 		return nil, err
@@ -188,23 +236,39 @@ func (r *queryResolver) Post(ctx context.Context, id string) (*manualmodels.Post
 }
 
 // UserCreated is the resolver for the userCreated field.
-func (r *subscriptionResolver) UserCreated(ctx context.Context) (<-chan *manualmodels.User, error) {
-	panic(fmt.Errorf("not implemented: UserCreated - userCreated"))
+func (r *subscriptionResolver) UserCreated(
+	ctx context.Context,
+) (<-chan *manualmodels.User, error) {
+
+	log.Println("[Resolver] Subscription.UserCreated")
+
+	return r.UserCreatedChan, nil
 }
 
 // PostCreated is the resolver for the postCreated field.
-func (r *subscriptionResolver) PostCreated(ctx context.Context) (<-chan *manualmodels.Post, error) {
-	panic(fmt.Errorf("not implemented: PostCreated - postCreated"))
+func (r *subscriptionResolver) PostCreated(
+	ctx context.Context,
+) (<-chan *manualmodels.Post, error) {
+
+	log.Println("[Resolver] Subscription.PostCreated")
+
+	return r.PostCreatedChan, nil
 }
 
 // CommentCreated is the resolver for the commentCreated field.
-func (r *subscriptionResolver) CommentCreated(ctx context.Context) (<-chan *manualmodels.Comment, error) {
-	panic(fmt.Errorf("not implemented: CommentCreated - commentCreated"))
+func (r *subscriptionResolver) CommentCreated(
+	ctx context.Context,
+) (<-chan *manualmodels.Comment, error) {
+
+	log.Println("[Resolver] Subscription.CommentCreated")
+
+	return r.CommentCreatedChan, nil
 }
 
 // Posts is the resolver for the posts field.
 func (r *userResolver) Posts(ctx context.Context, obj *manualmodels.User) ([]*manualmodels.Post, error) {
 	//panic(fmt.Errorf("not implemented: Posts - posts"))
+	log.Printf("[Resolver] User.Posts | userID=%s", obj.ID)
 	userID, err := strconv.ParseInt(obj.ID, 10, 64)
 	if err != nil {
 		return nil, err
@@ -222,6 +286,7 @@ func (r *userResolver) Posts(ctx context.Context, obj *manualmodels.User) ([]*ma
 // Comments is the resolver for the comments field.
 func (r *userResolver) Comments(ctx context.Context, obj *manualmodels.User) ([]*manualmodels.Comment, error) {
 	//panic(fmt.Errorf("not implemented: Comments - comments"))
+	log.Printf("[Resolver] User.Comments | userID=%s", obj.ID)
 	userID, err := strconv.ParseInt(obj.ID, 10, 64)
 	if err != nil {
 		return nil, err

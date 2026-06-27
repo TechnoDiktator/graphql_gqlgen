@@ -2,16 +2,19 @@ package repository
 
 import (
 	context "context"
-	"github.com/tarangrastogi/graphql_gqlgen/internal/db_models"
 
-	 "github.com/jackc/pgx/v5/pgxpool"
+	entity "github.com/tarangrastogi/graphql_gqlgen/internal/db_models"
+
+	"github.com/jackc/pgx/v5/pgxpool"
 )
+
 type PostRepository interface {
 	Create(ctx context.Context, post *entity.Post) (*entity.Post, error)
 	GetByID(ctx context.Context, id int64) (*entity.Post, error)
 	GetAll(ctx context.Context) ([]*entity.Post, error)
 	GetByUserID(ctx context.Context, userID int64) ([]*entity.Post, error)
 }
+
 // 	Update(ctx context.Context, post *entity.Post) error
 
 // 	Delete(ctx context.Context, id int64) error
@@ -20,13 +23,11 @@ type postRepository struct {
 	db *pgxpool.Pool
 }
 
-
 func NewPostRepository(db *pgxpool.Pool) PostRepository {
 	return &postRepository{
 		db: db,
 	}
 }
-
 
 func (r *postRepository) Create(
 	ctx context.Context,
@@ -81,7 +82,6 @@ func (r *postRepository) GetByID(ctx context.Context, id int64) (*entity.Post, e
 	return post, nil
 }
 
-
 func (r *postRepository) GetAll(ctx context.Context) ([]*entity.Post, error) {
 
 	query := `
@@ -92,64 +92,65 @@ func (r *postRepository) GetAll(ctx context.Context) ([]*entity.Post, error) {
 
 	if err != nil {
 		return nil, err
-	}	
+	}
 	defer rows.Close()
 
 	posts := []*entity.Post{}
 
 	for rows.Next() {
 		post := &entity.Post{}
-		err := rows.Scan(	
-		&post.ID,
-		&post.UserID,
-		&post.Title,
-		&post.Content,
+		err := rows.Scan(
+			&post.ID,
+			&post.UserID,
+			&post.Title,
+			&post.Content,
 		)
 		if err != nil {
 			return nil, err
-		}		
+		}
 		posts = append(posts, post)
 	}
 	return posts, nil
 }
 
+func (r *postRepository) GetByUserID(
+	ctx context.Context,
+	userID int64,
+) ([]*entity.Post, error) {
 
-func (r *postRepository) GetByUserID(ctx context.Context, userID int64) ([]*entity.Post, error) {
 	query := `
 		SELECT id, user_id, title, content
 		FROM posts
 		WHERE user_id = $1
 	`
-	rows, err := r.db.Query(ctx, query)
 
+	rows, err := r.db.Query(ctx, query, userID)
 	if err != nil {
 		return nil, err
-	}	
+	}
 	defer rows.Close()
 
-	posts := []*entity.Post{}
+	posts := make([]*entity.Post, 0)
 
 	for rows.Next() {
 		post := &entity.Post{}
-		err := rows.Scan(	
-		&post.ID,
-		&post.UserID,
-		&post.Title,
-		&post.Content,
+
+		err := rows.Scan(
+			&post.ID,
+			&post.UserID,
+			&post.Title,
+			&post.Content,
 		)
 		if err != nil {
 			return nil, err
-		}		
+		}
+
 		posts = append(posts, post)
 	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
 	return posts, nil
-
 }
-
-
-
-
-
-
-
-
